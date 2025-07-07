@@ -1,10 +1,20 @@
 import { Outlet } from "react-router";
+import Footer from "../components/shared/Footer";
+import Navbar from "../components/shared/Navbar";
 
 function RootLayout() {
   return (
-    <div>
-      <h1>Root Layout</h1>
-      <Outlet />
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      <Navbar />
+
+      {/* Main Content */}
+      <main className="flex-1">
+        <Outlet />
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
