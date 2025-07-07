@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaUpload, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
 import { districts, upazilas } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
@@ -125,57 +126,55 @@ function Register() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
-            {/* Avatar Upload */}
-            <div className="flex flex-col items-center">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
-                  {avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt="Avatar preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <FaUpload className="h-8 w-8 text-gray-400" />
-                  )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center">Registration Form</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              {/* Avatar Upload */}
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
+                    {avatarPreview ? (
+                      <img
+                        src={avatarPreview}
+                        alt="Avatar preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaUpload className="h-8 w-8 text-gray-400" />
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
+                <p className="mt-2 text-sm text-gray-500">Upload your photo</p>
               </div>
-              <p className="mt-2 text-sm text-gray-500">Upload your photo</p>
-            </div>
 
-            {/* Name */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name *
-              </label>
-              <input
+              {/* Name */}
+              <Input
+                label="Full Name"
+                required
+                placeholder="Enter your full name"
+                error={errors.name?.message}
                 {...register("name", {
                   required: "Name is required",
                   minLength: { value: 2, message: "Name must be at least 2 characters" }
                 })}
-                type="text"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                placeholder="Enter your full name"
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-              )}
-            </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address *
-              </label>
-              <input
+              {/* Email */}
+              <Input
+                label="Email Address"
+                type="email"
+                required
+                placeholder="Enter your email"
+                error={errors.email?.message}
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -183,167 +182,142 @@ function Register() {
                     message: "Invalid email address"
                   }
                 })}
-                type="email"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                placeholder="Enter your email"
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-              )}
-            </div>
 
-            {/* Blood Group */}
-            <div>
-              <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700">
-                Blood Group *
-              </label>
-              <select
+              {/* Blood Group */}
+              <Select
+                label="Blood Group"
+                required
+                placeholder="Select Blood Group"
+                error={errors.bloodGroup?.message}
                 {...register("bloodGroup", { required: "Blood group is required" })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
               >
-                <option value="">Select Blood Group</option>
                 {bloodGroups.map((group) => (
                   <option key={group.value} value={group.value}>
                     {group.label}
                   </option>
                 ))}
-              </select>
-              {errors.bloodGroup && (
-                <p className="mt-1 text-sm text-red-600">{errors.bloodGroup.message}</p>
-              )}
-            </div>
+              </Select>
 
-            {/* District */}
-            <div>
-              <label htmlFor="district" className="block text-sm font-medium text-gray-700">
-                District *
-              </label>
-              <select
+              {/* District */}
+              <Select
+                label="District"
+                required
+                placeholder="Select District"
+                error={errors.district?.message}
                 {...register("district", { required: "District is required" })}
                 onChange={handleDistrictChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
               >
-                <option value="">Select District</option>
                 {districts.map((district) => (
                   <option key={district.id} value={district.id}>
                     {district.name}
                   </option>
                 ))}
-              </select>
-              {errors.district && (
-                <p className="mt-1 text-sm text-red-600">{errors.district.message}</p>
-              )}
-            </div>
+              </Select>
 
-            {/* Upazila */}
-            <div>
-              <label htmlFor="upazila" className="block text-sm font-medium text-gray-700">
-                Upazila *
-              </label>
-              <select
-                {...register("upazila", { required: "Upazila is required" })}
+              {/* Upazila */}
+              <Select
+                label="Upazila"
+                required
+                placeholder="Select Upazila"
                 disabled={!selectedDistrict}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm disabled:bg-gray-100"
+                error={errors.upazila?.message}
+                {...register("upazila", { required: "Upazila is required" })}
               >
-                <option value="">Select Upazila</option>
                 {filteredUpazilas.map((upazila) => (
                   <option key={upazila.id} value={upazila.id}>
                     {upazila.name}
                   </option>
                 ))}
-              </select>
-              {errors.upazila && (
-                <p className="mt-1 text-sm text-red-600">{errors.upazila.message}</p>
-              )}
-            </div>
+              </Select>
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password *
-              </label>
-              <div className="relative">
-                <input
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: { value: 6, message: "Password must be at least 6 characters" }
-                  })}
-                  type={showPassword ? "text" : "password"}
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 top-1 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <FaEye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
+              {/* Password */}
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Password *
+                </label>
+                <div className="relative">
+                  <input
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: { value: 6, message: "Password must be at least 6 characters" }
+                    })}
+                    type={showPassword ? "text" : "password"}
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-red-600">{errors.password.message}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-              )}
-            </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password *
-              </label>
-              <div className="relative">
-                <input
-                  {...register("confirmPassword", {
-                    required: "Please confirm your password",
-                    validate: (value) => value === password || "Passwords do not match"
-                  })}
-                  type={showConfirmPassword ? "text" : "password"}
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                  placeholder="Confirm your password"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 top-1 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <FaEyeSlash className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <FaEye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
+              {/* Confirm Password */}
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Confirm Password *
+                </label>
+                <div className="relative">
+                  <input
+                    {...register("confirmPassword", {
+                      required: "Please confirm your password",
+                      validate: (value) => value === password || "Passwords do not match"
+                    })}
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+                )}
               </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Creating Account..." : "Create Account"}
-            </button>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="font-medium text-red-600 hover:text-red-500"
+              <Button
+                type="submit"
+                loading={loading}
+                className="w-full"
+                size="lg"
               >
-                Sign in here
-              </Link>
-            </p>
-          </div>
-        </form>
+                {loading ? "Creating Account..." : "Create Account"}
+              </Button>
+
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  Already have an account?{" "}
+                  <Link
+                    to="/login"
+                    className="font-medium text-red-600 hover:text-red-500"
+                  >
+                    Sign in here
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

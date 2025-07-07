@@ -1,5 +1,6 @@
 import { FaEnvelope, FaHandHoldingHeart, FaMapMarkerAlt, FaPhone, FaSearch, FaTint, FaUserPlus, FaUsers } from "react-icons/fa";
 import { Link } from "react-router";
+import { Button, Card, CardContent, Input, Textarea } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 
 function Home() {
@@ -21,30 +22,42 @@ function Home() {
             {/* Call to Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {!isAuthenticated() ? (
-                <Link
-                  to="/register"
-                  className="bg-white text-red-600 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center space-x-2 transition-colors"
+                <Button
+                  asChild
+                  size="lg"
+                  variant="secondary"
+                  className="bg-white text-red-600 hover:bg-gray-100"
                 >
-                  <FaUserPlus className="h-5 w-5" />
-                  <span>Join as a Donor</span>
-                </Link>
+                  <Link to="/register" className="flex items-center space-x-2">
+                    <FaUserPlus className="h-5 w-5" />
+                    <span>Join as a Donor</span>
+                  </Link>
+                </Button>
               ) : (
-                <Link
-                  to="/dashboard/create-donation-request"
-                  className="bg-white text-red-600 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center space-x-2 transition-colors"
+                <Button
+                  asChild
+                  size="lg"
+                  variant="secondary"
+                  className="bg-white text-red-600 hover:bg-gray-100"
                 >
-                  <FaTint className="h-5 w-5" />
-                  <span>Request Blood</span>
-                </Link>
+                  <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
+                    <FaTint className="h-5 w-5" />
+                    <span>Request Blood</span>
+                  </Link>
+                </Button>
               )}
               
-              <Link
-                to="/search"
-                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600 px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center space-x-2 transition-colors"
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600"
               >
-                <FaSearch className="h-5 w-5" />
-                <span>Search Donors</span>
-              </Link>
+                <Link to="/search" className="flex items-center space-x-2">
+                  <FaSearch className="h-5 w-5" />
+                  <span>Search Donors</span>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -55,31 +68,37 @@ function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Lives Saved */}
-            <div className="text-center p-8 bg-red-50 rounded-lg">
-              <div className="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaHandHoldingHeart className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">10,000+</h3>
-              <p className="text-gray-600">Lives Saved</p>
-            </div>
+            <Card className="text-center p-8 bg-red-50">
+              <CardContent className="pt-6">
+                <div className="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaHandHoldingHeart className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">10,000+</h3>
+                <p className="text-gray-600">Lives Saved</p>
+              </CardContent>
+            </Card>
 
             {/* Active Donors */}
-            <div className="text-center p-8 bg-red-50 rounded-lg">
-              <div className="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaUsers className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">5,000+</h3>
-              <p className="text-gray-600">Active Donors</p>
-            </div>
+            <Card className="text-center p-8 bg-red-50">
+              <CardContent className="pt-6">
+                <div className="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaUsers className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">5,000+</h3>
+                <p className="text-gray-600">Active Donors</p>
+              </CardContent>
+            </Card>
 
             {/* Blood Units */}
-            <div className="text-center p-8 bg-red-50 rounded-lg">
-              <div className="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaTint className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">25,000+</h3>
-              <p className="text-gray-600">Blood Units Donated</p>
-            </div>
+            <Card className="text-center p-8 bg-red-50">
+              <CardContent className="pt-6">
+                <div className="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaTint className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">25,000+</h3>
+                <p className="text-gray-600">Blood Units Donated</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -98,37 +117,43 @@ function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Save Lives */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <FaHandHoldingHeart className="h-6 w-6 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Save Lives</h3>
-              <p className="text-gray-600">
-                One blood donation can save up to three lives. Your single act of kindness can make a huge difference.
-              </p>
-            </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                  <FaHandHoldingHeart className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Save Lives</h3>
+                <p className="text-gray-600">
+                  One blood donation can save up to three lives. Your single act of kindness can make a huge difference.
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Emergency Ready */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <FaPhone className="h-6 w-6 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Emergency Ready</h3>
-              <p className="text-gray-600">
-                Blood is needed every 2 seconds. Help us maintain emergency blood supplies for critical situations.
-              </p>
-            </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                  <FaPhone className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Emergency Ready</h3>
+                <p className="text-gray-600">
+                  Blood is needed every 2 seconds. Help us maintain emergency blood supplies for critical situations.
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Health Benefits */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <FaUsers className="h-6 w-6 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Health Benefits</h3>
-              <p className="text-gray-600">
-                Regular blood donation can improve your health by reducing iron levels and providing free health checkups.
-              </p>
-            </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                  <FaUsers className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Health Benefits</h3>
+                <p className="text-gray-600">
+                  Regular blood donation can improve your health by reducing iron levels and providing free health checkups.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -199,50 +224,33 @@ function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Send us a message</h3>
-              <form className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
+            <Card>
+              <CardContent className="p-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-6">Send us a message</h3>
+                <form className="space-y-6">
+                  <Input
+                    label="Your Name"
                     placeholder="Enter your name"
                   />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <input
+                  
+                  <Input
+                    label="Email Address"
                     type="email"
-                    id="email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
                     placeholder="Enter your email"
                   />
-                </div>
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
+                  
+                  <Textarea
+                    label="Message"
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
                     placeholder="Enter your message"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md font-semibold transition-colors"
-                >
-                  Send Message
-                </button>
-              </form>
-            </div>
+                  />
+                  
+                  <Button type="submit" className="w-full">
+                    Send Message
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
 
             {/* Contact Information */}
             <div className="space-y-8">
