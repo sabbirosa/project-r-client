@@ -1,19 +1,19 @@
 import axios from "axios";
-import useAuth from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_API_URI,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 function useAxiosSecure() {
-  const { user } = useAuth();
+  const { token } = useAuth();
 
   axiosSecure.interceptors.request.use((config) => {
-    if (user?.accessToken) {
-      config.headers.authorization = `Bearer ${user.accessToken}`;
+    if (token) {
+      config.headers.authorization = `Bearer ${token}`;
     }
     return config;
   });

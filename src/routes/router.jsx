@@ -4,6 +4,7 @@ import RootLayout from "../layouts/RootLayout";
 import Dashboard from "../pages/Dashboard";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Profile from "../pages/Profile";
 import Register from "../pages/Register";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
@@ -59,7 +60,7 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <div>Profile</div>, // TODO: Create this component
+        element: <Profile />,
       },
       
       // Admin only routes

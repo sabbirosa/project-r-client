@@ -153,6 +153,39 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fetch and update user data from server
+  const updateUserData = async () => {
+    try {
+      if (!token) {
+        throw new Error("No authentication token available");
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch user data");
+      }
+
+      const data = await response.json();
+      
+      // Update user state with fresh data
+      setUser(data);
+      localStorage.setItem("bloodDonation_user", JSON.stringify(data));
+      
+      return { success: true, user: data };
+    } catch (error) {
+      console.error("Update user data error:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
   // Check if user is authenticated
   const isAuthenticated = () => {
     return !!(user && token);
@@ -202,6 +235,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
+    updateUserData,
     
     // Helper methods
     isAuthenticated,
