@@ -24,14 +24,12 @@ function DashboardLayout() {
       {
         name: "Dashboard",
         href: "/dashboard",
-        icon: FaHome,
-        roles: ["admin", "donor", "volunteer"]
+        icon: FaHome
       },
       {
         name: "Profile",
         href: "/dashboard/profile",
-        icon: FaUser,
-        roles: ["admin", "donor", "volunteer"]
+        icon: FaUser
       }
     ];
 
@@ -39,59 +37,54 @@ function DashboardLayout() {
       {
         name: "My Donation Requests",
         href: "/dashboard/my-donation-requests",
-        icon: FaTint,
-        roles: ["donor"]
+        icon: FaTint
       },
       {
         name: "Create Donation Request",
         href: "/dashboard/create-donation-request",
-        icon: FaHandHoldingHeart,
-        roles: ["donor"]
+        icon: FaHandHoldingHeart
       }
     ];
 
-    const adminItems = [
-      {
-        name: "All Users",
-        href: "/dashboard/all-users",
-        icon: FaUsers,
-        roles: ["admin"]
-      },
+    const volunteerItems = [
       {
         name: "All Blood Donations",
         href: "/dashboard/all-blood-donation-request",
-        icon: FaTint,
-        roles: ["admin", "volunteer"]
+        icon: FaTint
       },
       {
         name: "Content Management",
         href: "/dashboard/content-management",
-        icon: FaChartBar,
-        roles: ["admin", "volunteer"]
+        icon: FaChartBar
+      }
+    ];
+
+    const adminOnlyItems = [
+      {
+        name: "All Users",
+        href: "/dashboard/all-users",
+        icon: FaUsers
       },
       {
         name: "Funding",
         href: "/dashboard/funding",
-        icon: FaHandsHelping,
-        roles: ["admin"]
+        icon: FaHandsHelping
       }
     ];
 
+    // Build navigation based on user role
     let items = [...baseItems];
     
     if (user?.role === "donor") {
       items = [...items, ...donorItems];
-    }
-    
-    if (user?.role === "admin") {
-      items = [...items, ...donorItems, ...adminItems];
-    }
-    
-    if (user?.role === "volunteer") {
-      items = [...items, ...adminItems.filter(item => item.roles.includes("volunteer"))];
+    } else if (user?.role === "volunteer") {
+      items = [...items, ...volunteerItems];
+    } else if (user?.role === "admin") {
+      // Admin gets access to everything
+      items = [...items, ...donorItems, ...volunteerItems, ...adminOnlyItems];
     }
 
-    return items.filter(item => item.roles.includes(user?.role));
+    return items;
   };
 
   const navigationItems = getNavigationItems();

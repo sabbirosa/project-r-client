@@ -1,28 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { FaEdit, FaEye, FaPlus, FaTint, FaTrash } from "react-icons/fa";
+import { FaEdit, FaEye, FaFilter, FaPlus, FaTint, FaTrash } from "react-icons/fa";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
 import useDonationAPI from "../api/useDonationAPI";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Modal, Pagination, Select, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 
-function Dashboard() {
+function MyDonationRequests() {
   const { user } = useAuth();
   const donationAPI = useDonationAPI();
+  
+  // State for pagination and filtering
+  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  const itemsPerPage = 10;
 
-  // Fetch recent donation requests
+  // Fetch donation requests with pagination and filtering
   const {
-    data: recentRequests,
+    data: requestsData,
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['recentDonationRequests'],
-    queryFn: () => donationAPI.getRecentRequests(3),
+    queryKey: ['myDonationRequests', currentPage, statusFilter],
+    queryFn: () => donationAPI.getMyRequests({
+      page: currentPage,
+      limit: itemsPerPage,
+      status: statusFilter || undefined
+    }),
     enabled: !!user
   });
 
@@ -57,6 +67,17 @@ function Dashboard() {
     }
   };
 
+  // Handle filter change
+  const handleFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   // Get status badge variant
   const getStatusBadge = (status) => {
     const variants = {
@@ -77,44 +98,67 @@ function Dashboard() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <LoadingSpinner size="lg" text="Loading dashboard..." />
+        <LoadingSpinner size="lg" text="Loading donation requests..." />
       </div>
     );
   }
 
+  const requests = requestsData?.requests || [];
+  const totalPages = requestsData?.totalPages || 0;
+  const totalRequests = requestsData?.total || 0;
+
   return (
-    <div className="space-y-8">
-      {/* Welcome Section */}
+    <div className="space-y-6">
+      {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-            <FaTint className="text-red-600" />
-            <span>Welcome back, {user?.name}!</span>
-          </CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+              <FaTint className="text-red-600" />
+              <span>My Donation Requests</span>
+            </CardTitle>
+            <Button asChild>
+              <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
+                <FaPlus className="h-4 w-4" />
+                <span>Create New Request</span>
+              </Link>
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            Thank you for being part of our blood donation community. Every donation counts and helps save lives.
-          </p>
+      </Card>
+
+      {/* Filters and Stats */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <FaFilter className="text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filter by status:</span>
+              </div>
+              <Select
+                value={statusFilter}
+                onChange={handleFilterChange}
+                className="min-w-48"
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="inprogress">In Progress</option>
+                <option value="done">Completed</option>
+                <option value="canceled">Cancelled</option>
+              </Select>
+            </div>
+            <div className="text-sm text-gray-600">
+              Total: {totalRequests} request{totalRequests !== 1 ? 's' : ''}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Recent Donation Requests Section */}
-      {recentRequests && recentRequests.length > 0 && (
+      {/* Requests Table */}
+      {requests.length > 0 ? (
         <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                Recent Donation Requests
-              </CardTitle>
-              <Button asChild>
-                <Link to="/dashboard/my-donation-requests">
-                  View My All Requests
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -129,7 +173,7 @@ function Dashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentRequests.map((request) => (
+                  {requests.map((request) => (
                     <TableRow key={request._id}>
                       <TableCell className="font-medium">
                         {request.recipientName}
@@ -161,7 +205,7 @@ function Dashboard() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap gap-2">
                           {/* Edit Button */}
                           <Button asChild size="sm" variant="outline">
                             <Link to={`/dashboard/edit-donation-request/${request._id}`}>
@@ -216,27 +260,49 @@ function Dashboard() {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
-
-      {/* No Requests Message */}
-      {recentRequests && recentRequests.length === 0 && (
+      ) : (
+        /* No Requests State */
         <Card>
           <CardContent className="text-center py-12">
             <FaTint className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Donation Requests Yet
+              {statusFilter ? `No ${statusFilter} requests found` : 'No Donation Requests Yet'}
             </h3>
             <p className="text-gray-500 mb-6">
-              You haven't created any donation requests yet. Create your first request to help someone in need.
+              {statusFilter 
+                ? `You don't have any ${statusFilter} donation requests.` 
+                : "You haven't created any donation requests yet. Create your first request to help someone in need."
+              }
             </p>
-            <Button asChild>
-              <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
-                <FaPlus className="h-4 w-4" />
-                <span>Create Donation Request</span>
-              </Link>
-            </Button>
+            {!statusFilter && (
+              <Button asChild>
+                <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
+                  <FaPlus className="h-4 w-4" />
+                  <span>Create Donation Request</span>
+                </Link>
+              </Button>
+            )}
+            {statusFilter && (
+              <Button 
+                variant="outline" 
+                onClick={() => setStatusFilter("")}
+              >
+                Clear Filter
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
@@ -293,4 +359,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default MyDonationRequests; 

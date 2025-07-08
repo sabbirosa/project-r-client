@@ -1,9 +1,12 @@
 import { createBrowserRouter } from "react-router";
 import DashboardLayout from "../layouts/DashboardLayout";
 import RootLayout from "../layouts/RootLayout";
+import CreateDonationRequest from "../pages/CreateDonationRequest";
 import Dashboard from "../pages/Dashboard";
+import EditDonationRequest from "../pages/EditDonationRequest";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import MyDonationRequests from "../pages/MyDonationRequests";
 import Profile from "../pages/Profile";
 import Register from "../pages/Register";
 import PrivateRoute from "./PrivateRoute";
@@ -52,57 +55,43 @@ const router = createBrowserRouter([
       // Donor routes
       {
         path: "my-donation-requests",
-        element: <div>My Donation Requests</div>, // TODO: Create this component
+        element: <MyDonationRequests />,
       },
       {
         path: "create-donation-request",
-        element: <div>Create Donation Request</div>, // TODO: Create this component
+        element: <CreateDonationRequest />,
+      },
+      {
+        path: "edit-donation-request/:id",
+        element: <EditDonationRequest />,
       },
       {
         path: "profile",
         element: <Profile />,
       },
       
-      // Admin only routes
-      {
-        path: "all-users",
-        element: (
-          <PrivateRoute requiredRole="admin">
-            <div>All Users</div> {/* TODO: Create this component */}
-          </PrivateRoute>
-        ),
-      },
+      // Admin/Volunteer routes
       {
         path: "all-blood-donation-request",
-        element: (
-          <PrivateRoute>
-            <div>All Blood Donation Requests</div> {/* TODO: Create this component */}
-          </PrivateRoute>
-        ),
+        element: <div>All Blood Donation Requests</div> // TODO: Create this component
       },
       {
         path: "content-management",
-        element: (
-          <PrivateRoute>
-            <div>Content Management</div> {/* TODO: Create this component */}
-          </PrivateRoute>
-        ),
+        element: <div>Content Management</div> // TODO: Create this component
       },
       {
         path: "content-management/add-blog",
-        element: (
-          <PrivateRoute>
-            <div>Add Blog</div> {/* TODO: Create this component */}
-          </PrivateRoute>
-        ),
+        element: <div>Add Blog</div> // TODO: Create this component
+      },
+      
+      // Admin only routes
+      {
+        path: "all-users",
+        element: <div>All Users</div> // TODO: Create this component
       },
       {
         path: "funding",
-        element: (
-          <PrivateRoute requiredRole="admin">
-            <div>Funding</div> {/* TODO: Create this component */}
-          </PrivateRoute>
-        ),
+        element: <div>Funding</div> // TODO: Create this component
       },
     ],
   },
