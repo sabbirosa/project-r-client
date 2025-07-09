@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaUpload, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
+import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
 import { districts, upazilas } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
@@ -14,8 +16,10 @@ function Register() {
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   
   const { register: registerUser, loading } = useAuth();
+  const publicAPI = usePublicAPI();
   const navigate = useNavigate();
 
   const {
@@ -56,28 +60,28 @@ function Register() {
     }
   };
 
-  // Upload avatar to imgBB
+  // Upload avatar using the improved API
   const uploadAvatarToImgBB = async (imageFile) => {
-    const formData = new FormData();
-    formData.append("image", imageFile);
-
     try {
-      const response = await fetch(
-        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const data = await response.json();
-      if (data.success) {
-        return data.data.url;
-      } else {
-        throw new Error("Failed to upload image");
-      }
+      setUploadingAvatar(true);
+      const response = await publicAPI.uploadImage(imageFile);
+      return response.data.url;
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error uploading avatar:", error);
+      
+      // Handle specific error messages
+      if (error.message.includes('API key not configured')) {
+        toast.error('Please configure ImageBB API key in your .env file');
+      } else if (error.message.includes('file type')) {
+        toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
+      } else if (error.message.includes('size')) {
+        toast.error('Image size is too large. Please select an image under 10MB');
+      } else {
+        toast.error(error.message || 'Failed to upload avatar. Please try again.');
+      }
       throw error;
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -297,11 +301,11 @@ function Register() {
 
               <Button
                 type="submit"
-                loading={loading}
+                loading={loading || uploadingAvatar}
                 className="w-full"
                 size="lg"
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading || uploadingAvatar ? "Creating Account..." : "Create Account"}
               </Button>
 
               <div className="text-center">

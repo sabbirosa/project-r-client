@@ -1,3 +1,4 @@
+import JoditEditor from "jodit-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowLeft, FaImage, FaUpload } from "react-icons/fa";
@@ -5,7 +6,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useAdminAPI from "../api/useAdminAPI";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Textarea } from "../components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner } from "../components/ui";
 
 function AddBlog() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function AddBlog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [content, setContent] = useState("");
 
   const {
     register,
@@ -26,22 +28,47 @@ function AddBlog() {
 
   const thumbnailUrl = watch("thumbnail");
 
+  // Jodit editor configuration
+  const editorConfig = {
+    readonly: false,
+    height: 400,
+    placeholder: "Write your blog content here...",
+    toolbar: true,
+    spellcheck: true,
+    language: "en",
+    toolbarButtonSize: "medium",
+    toolbarAdaptive: false,
+    showCharsCounter: true,
+    showWordsCounter: true,
+    showXPathInStatusbar: false,
+    askBeforePasteHTML: true,
+    askBeforePasteFromWord: true,
+    defaultActionOnPaste: "insert_as_html",
+    buttons: [
+      "undo", "redo", "|",
+      "bold", "strikethrough", "underline", "italic", "|",
+      "superscript", "subscript", "|",
+      "align", "|",
+      "ul", "ol", "|",
+      "outdent", "indent", "|",
+      "font", "fontsize", "brush", "paragraph", "|",
+      "image", "link", "table", "|",
+      "hr", "eraser", "copyformat", "|",
+      "fullsize", "selectall", "print", "|",
+      "source", "|",
+    ],
+    uploader: {
+      insertImageAsBase64URI: true
+    },
+    removeButtons: ["brush", "file"],
+    showPlaceholder: true,
+    hidePoweredByJodit: true
+  };
+
   // Handle image upload
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file');
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
-      return;
-    }
 
     setIsUploadingImage(true);
     try {
@@ -57,7 +84,17 @@ function AddBlog() {
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error('Failed to upload image. Please try again.');
+      
+      // Handle specific error messages
+      if (error.message.includes('API key not configured')) {
+        toast.error('Please configure ImageBB API key in your .env file');
+      } else if (error.message.includes('file type')) {
+        toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
+      } else if (error.message.includes('size')) {
+        toast.error('Image size is too large. Please select an image under 10MB');
+      } else {
+        toast.error(error.message || 'Failed to upload image. Please try again.');
+      }
     } finally {
       setIsUploadingImage(false);
     }
@@ -65,12 +102,18 @@ function AddBlog() {
 
   // Handle form submission
   const onSubmit = async (data) => {
+    // Validate content
+    if (!content || content.trim().length < 50) {
+      toast.error('Blog content must be at least 50 characters long');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await adminAPI.createBlog({
         title: data.title,
         thumbnail: data.thumbnail || "",
-        content: data.content
+        content: content
       });
 
       toast.success('Blog created successfully!');
@@ -84,7 +127,7 @@ function AddBlog() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <Card>
         <CardHeader>
@@ -203,29 +246,27 @@ function AddBlog() {
               </div>
             </div>
 
-            {/* Blog Content */}
+            {/* Blog Content - Rich Text Editor */}
             <div>
-              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Blog Content *
               </label>
-              <Textarea
-                id="content"
-                rows={15}
-                placeholder="Write your blog content here..."
-                {...register("content", {
-                  required: "Blog content is required",
-                  minLength: {
-                    value: 50,
-                    message: "Content must be at least 50 characters long"
-                  }
-                })}
-                className={`resize-none ${errors.content ? "border-red-500" : ""}`}
-              />
-              {errors.content && (
-                <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>
+              <div className="border border-gray-300 rounded-md overflow-hidden">
+                <JoditEditor
+                  value={content}
+                  config={editorConfig}
+                  tabIndex={1}
+                  onBlur={(newContent) => setContent(newContent)}
+                  onChange={(newContent) => setContent(newContent)}
+                />
+              </div>
+              {content.length > 0 && content.length < 50 && (
+                <p className="text-red-500 text-sm mt-1">
+                  Content must be at least 50 characters long ({content.length}/50)
+                </p>
               )}
               <p className="text-sm text-gray-500 mt-2">
-                You can use HTML tags for formatting (e.g., &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, etc.)
+                Use the rich text editor to format your content with headings, lists, links, images, and more.
               </p>
             </div>
 
@@ -241,7 +282,7 @@ function AddBlog() {
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !content || content.trim().length < 50}
                 className="flex items-center space-x-2"
               >
                 {isSubmitting ? (
@@ -269,8 +310,8 @@ function AddBlog() {
             <ul className="list-disc list-inside space-y-1">
               <li>Use a clear and compelling title that describes your content</li>
               <li>Add a thumbnail image to make your blog more engaging</li>
-              <li>Write informative content that provides value to readers</li>
-              <li>Use proper formatting with HTML tags for better readability</li>
+              <li>Use the rich text editor to format your content professionally</li>
+              <li>Include headings, paragraphs, lists, and images for better readability</li>
               <li>Your blog will be saved as a draft and can be published later by an admin</li>
             </ul>
           </div>

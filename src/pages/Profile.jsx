@@ -117,7 +117,17 @@ function Profile() {
       return response.data.url;
     } catch (error) {
       console.error("Error uploading image:", error);
-      toast.error("Failed to upload image");
+      
+      // Handle specific error messages
+      if (error.message.includes('API key not configured')) {
+        toast.error('Please configure ImageBB API key in your .env file');
+      } else if (error.message.includes('file type')) {
+        toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
+      } else if (error.message.includes('size')) {
+        toast.error('Image size is too large. Please select an image under 10MB');
+      } else {
+        toast.error(error.message || 'Failed to upload avatar. Please try again.');
+      }
       throw error;
     } finally {
       setUploadingImage(false);
