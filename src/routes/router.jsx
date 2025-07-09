@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router";
 import DashboardLayout from "../layouts/DashboardLayout";
 import RootLayout from "../layouts/RootLayout";
 import AddBlog from "../pages/AddBlog";
+import AllBloodDonationRequests from "../pages/AllBloodDonationRequests";
 import AllUsers from "../pages/AllUsers";
 import ContentManagement from "../pages/ContentManagement";
 import CreateDonationRequest from "../pages/CreateDonationRequest";
@@ -77,12 +78,16 @@ const router = createBrowserRouter([
       // Admin/Volunteer routes
       {
         path: "all-blood-donation-request",
-        element: <div>All Blood Donation Requests</div> // TODO: Create this component
+        element: (
+          <PrivateRoute>
+            <AllBloodDonationRequests />
+          </PrivateRoute>
+        )
       },
       {
         path: "content-management",
         element: (
-          <PrivateRoute requiredRole="admin">
+          <PrivateRoute requiredRoles={["admin", "volunteer"]}>
             <ContentManagement />
           </PrivateRoute>
         )
@@ -90,7 +95,7 @@ const router = createBrowserRouter([
       {
         path: "content-management/add-blog",
         element: (
-          <PrivateRoute requiredRole="admin">
+          <PrivateRoute requiredRoles={["admin", "volunteer"]}>
             <AddBlog />
           </PrivateRoute>
         )
@@ -98,7 +103,7 @@ const router = createBrowserRouter([
       {
         path: "content-management/edit-blog/:id",
         element: (
-          <PrivateRoute requiredRole="admin">
+          <PrivateRoute requiredRoles={["admin", "volunteer"]}>
             <div>Edit Blog</div> {/* TODO: Create this component */}
           </PrivateRoute>
         )

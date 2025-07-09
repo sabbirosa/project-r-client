@@ -1,29 +1,49 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { FaEdit, FaEye, FaPlus, FaTint, FaTrash } from "react-icons/fa";
+import { FaEdit, FaEye, FaHandHoldingHeart, FaMoneyBillWave, FaPlus, FaTint, FaTrash, FaUsers } from "react-icons/fa";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
+import useAdminAPI from "../api/useAdminAPI";
 import useDonationAPI from "../api/useDonationAPI";
+import useFundingAPI from "../api/useFundingAPI";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 
 function Dashboard() {
   const { user } = useAuth();
   const donationAPI = useDonationAPI();
+  const adminAPI = useAdminAPI();
+  const fundingAPI = useFundingAPI();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Fetch recent donation requests
+  // Fetch data based on user role
+  const isDonor = user?.role === 'donor';
+  const isAdminOrVolunteer = user?.role === 'admin' || user?.role === 'volunteer';
+
+  // Fetch recent donation requests (for donors only)
   const {
     data: recentRequests,
-    isLoading,
-    error,
-    refetch
+    isLoading: requestsLoading,
+    error: requestsError,
+    refetch: refetchRequests
   } = useQuery({
     queryKey: ['recentDonationRequests'],
     queryFn: () => donationAPI.getRecentRequests(3),
-    enabled: !!user
+    enabled: !!user && isDonor
+  });
+
+  // Fetch dashboard statistics (for admin/volunteer)
+  const {
+    data: dashboardStats,
+    isLoading: statsLoading,
+    error: statsError,
+    refetch: refetchStats
+  } = useQuery({
+    queryKey: ['dashboardStats'],
+    queryFn: () => adminAPI.getDashboardStats(),
+    enabled: !!user && isAdminOrVolunteer
   });
 
   // Handle status update (done/cancel)
@@ -31,7 +51,7 @@ function Dashboard() {
     try {
       await donationAPI.updateStatus(requestId, newStatus);
       toast.success(`Request ${newStatus === 'done' ? 'marked as completed' : 'cancelled'} successfully!`);
-      refetch();
+      refetchRequests();
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Failed to update request status');
@@ -48,7 +68,7 @@ function Dashboard() {
       toast.success('Donation request deleted successfully!');
       setShowDeleteModal(false);
       setSelectedRequestId(null);
-      refetch();
+      refetchRequests();
     } catch (error) {
       console.error('Error deleting request:', error);
       toast.error('Failed to delete donation request');
@@ -74,6 +94,9 @@ function Dashboard() {
     return `${formattedDate} ${time}`;
   };
 
+  const isLoading = isDonor ? requestsLoading : statsLoading;
+  const error = isDonor ? requestsError : statsError;
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-64">
@@ -94,13 +117,115 @@ function Dashboard() {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">
-            Thank you for being part of our blood donation community. Every donation counts and helps save lives.
+            {isDonor 
+              ? "Thank you for being part of our blood donation community. Every donation counts and helps save lives."
+              : `Welcome to your ${user?.role} dashboard. Here you can see important statistics and manage the platform.`
+            }
           </p>
         </CardContent>
       </Card>
 
-      {/* Recent Donation Requests Section */}
-      {recentRequests && recentRequests.length > 0 && (
+      {/* Statistics Cards for Admin/Volunteer */}
+      {isAdminOrVolunteer && dashboardStats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Total Users */}
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-600 text-sm font-medium mb-1">Total Users</p>
+                  <p className="text-3xl font-bold text-blue-900">{dashboardStats.totalUsers}</p>
+                  <p className="text-blue-700 text-sm">Active Donors</p>
+                </div>
+                <div className="bg-blue-500 p-3 rounded-full">
+                  <FaUsers className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Total Blood Donation Requests */}
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-red-600 text-sm font-medium mb-1">Blood Requests</p>
+                  <p className="text-3xl font-bold text-red-900">{dashboardStats.totalRequests}</p>
+                  <p className="text-red-700 text-sm">All Time</p>
+                </div>
+                <div className="bg-red-500 p-3 rounded-full">
+                  <FaHandHoldingHeart className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Total Funding */}
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-600 text-sm font-medium mb-1">Total Funding</p>
+                  <p className="text-3xl font-bold text-green-900">${dashboardStats.totalFunding}</p>
+                  <p className="text-green-700 text-sm">Raised</p>
+                </div>
+                <div className="bg-green-500 p-3 rounded-full">
+                  <FaMoneyBillWave className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Quick Actions for Admin/Volunteer */}
+      {isAdminOrVolunteer && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-gray-900">
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Button asChild className="h-20 flex-col">
+                <Link to="/dashboard/all-blood-donation-request">
+                  <FaTint className="h-6 w-6 mb-2" />
+                  Manage Blood Requests
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-20 flex-col">
+                <Link to="/dashboard/content-management">
+                  <FaEdit className="h-6 w-6 mb-2" />
+                  Content Management
+                </Link>
+              </Button>
+
+              {user?.role === 'admin' && (
+                <>
+                  <Button asChild variant="outline" className="h-20 flex-col">
+                    <Link to="/dashboard/all-users">
+                      <FaUsers className="h-6 w-6 mb-2" />
+                      Manage Users
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" className="h-20 flex-col">
+                    <Link to="/dashboard/funding">
+                      <FaMoneyBillWave className="h-6 w-6 mb-2" />
+                      View Funding
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Donation Requests Section (for donors only) */}
+      {isDonor && recentRequests && recentRequests.length > 0 && (
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -220,8 +345,8 @@ function Dashboard() {
         </Card>
       )}
 
-      {/* No Requests Message */}
-      {recentRequests && recentRequests.length === 0 && (
+      {/* No Requests Message (for donors only) */}
+      {isDonor && recentRequests && recentRequests.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
             <FaTint className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -249,12 +374,12 @@ function Dashboard() {
               <FaTint className="mx-auto h-12 w-12" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Failed to Load Requests
+              Failed to Load Dashboard
             </h3>
             <p className="text-gray-500 mb-6">
-              There was an error loading your donation requests. Please try again.
+              There was an error loading your dashboard data. Please try again.
             </p>
-            <Button onClick={() => refetch()}>
+            <Button onClick={() => isDonor ? refetchRequests() : refetchStats()}>
               Try Again
             </Button>
           </CardContent>

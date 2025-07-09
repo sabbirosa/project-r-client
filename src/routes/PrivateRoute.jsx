@@ -2,7 +2,7 @@ import { Navigate, useLocation } from "react-router";
 import { LoadingSpinner } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 
-const PrivateRoute = ({ children, requiredRole = null }) => {
+const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => {
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
@@ -20,8 +20,20 @@ const PrivateRoute = ({ children, requiredRole = null }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check if user has required role
-  if (requiredRole && user?.role !== requiredRole) {
+  // Check if user has required role or is in required roles array
+  const hasRequiredRole = () => {
+    if (requiredRole && user?.role !== requiredRole) {
+      return false;
+    }
+    
+    if (requiredRoles.length > 0 && !requiredRoles.includes(user?.role)) {
+      return false;
+    }
+    
+    return true;
+  };
+
+  if ((requiredRole || requiredRoles.length > 0) && !hasRequiredRole()) {
     // If user doesn't have required role, redirect based on their actual role
     if (user?.role === 'admin') {
       return <Navigate to="/dashboard" replace />;
