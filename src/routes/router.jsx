@@ -1,9 +1,13 @@
 import { createBrowserRouter } from "react-router";
 import DashboardLayout from "../layouts/DashboardLayout";
 import RootLayout from "../layouts/RootLayout";
+import AddBlog from "../pages/AddBlog";
+import AllUsers from "../pages/AllUsers";
+import ContentManagement from "../pages/ContentManagement";
 import CreateDonationRequest from "../pages/CreateDonationRequest";
 import Dashboard from "../pages/Dashboard";
 import EditDonationRequest from "../pages/EditDonationRequest";
+import Funding from "../pages/Funding";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import MyDonationRequests from "../pages/MyDonationRequests";
@@ -77,21 +81,41 @@ const router = createBrowserRouter([
       },
       {
         path: "content-management",
-        element: <div>Content Management</div> // TODO: Create this component
+        element: (
+          <PrivateRoute requiredRole="admin">
+            <ContentManagement />
+          </PrivateRoute>
+        )
       },
       {
         path: "content-management/add-blog",
-        element: <div>Add Blog</div> // TODO: Create this component
+        element: (
+          <PrivateRoute requiredRole="admin">
+            <AddBlog />
+          </PrivateRoute>
+        )
+      },
+      {
+        path: "content-management/edit-blog/:id",
+        element: (
+          <PrivateRoute requiredRole="admin">
+            <div>Edit Blog</div> {/* TODO: Create this component */}
+          </PrivateRoute>
+        )
       },
       
       // Admin only routes
       {
         path: "all-users",
-        element: <div>All Users</div> // TODO: Create this component
+        element: (
+          <PrivateRoute requiredRole="admin">
+            <AllUsers />
+          </PrivateRoute>
+        )
       },
       {
         path: "funding",
-        element: <div>Funding</div> // TODO: Create this component
+        element: <Funding />
       },
     ],
   },

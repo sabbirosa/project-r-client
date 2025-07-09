@@ -30,6 +30,11 @@ function useAdminAPI() {
     return response.data;
   };
 
+  const getBlogById = async (blogId) => {
+    const response = await axiosSecure.get(`/admin/blogs/${blogId}`);
+    return response.data;
+  };
+
   const createBlog = async (blogData) => {
     const response = await axiosSecure.post("/admin/blogs", blogData);
     return response.data;
@@ -45,13 +50,8 @@ function useAdminAPI() {
     return response.data;
   };
 
-  const publishBlog = async (blogId) => {
-    const response = await axiosSecure.patch(`/admin/blogs/${blogId}/publish`);
-    return response.data;
-  };
-
-  const unpublishBlog = async (blogId) => {
-    const response = await axiosSecure.patch(`/admin/blogs/${blogId}/unpublish`);
+  const updateBlogStatus = async (blogId, status) => {
+    const response = await axiosSecure.patch(`/admin/blogs/${blogId}/status`, { status });
     return response.data;
   };
 
@@ -68,23 +68,23 @@ function useAdminAPI() {
   };
 
   const getFundingStats = async () => {
-    const response = await axiosSecure.get("/admin/funding/stats");
+    const response = await axiosSecure.get("/funding/stats");
     return response.data;
   };
 
-  // General admin operations
+  // General admin operations - reusing existing donation API routes
   const getAllDonationRequests = async (params = {}) => {
-    const response = await axiosSecure.get("/admin/donations", { params });
+    const response = await axiosSecure.get("/donations", { params });
     return response.data;
   };
 
   const updateDonationStatus = async (donationId, status) => {
-    const response = await axiosSecure.patch(`/admin/donations/${donationId}/status`, { status });
+    const response = await axiosSecure.patch(`/donations/${donationId}/status`, { status });
     return response.data;
   };
 
   const deleteDonationRequest = async (donationId) => {
-    const response = await axiosSecure.delete(`/admin/donations/${donationId}`);
+    const response = await axiosSecure.delete(`/donations/${donationId}`);
     return response.data;
   };
 
@@ -96,11 +96,11 @@ function useAdminAPI() {
     deleteUser,
     // Blog management
     getAllBlogs,
+    getBlogById,
     createBlog,
     updateBlog,
     deleteBlog,
-    publishBlog,
-    unpublishBlog,
+    updateBlogStatus,
     // Dashboard statistics
     getDashboardStats,
     // Funding management
