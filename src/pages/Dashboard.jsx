@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { FaEdit, FaEye, FaHandHoldingHeart, FaMoneyBillWave, FaPlus, FaTint, FaTrash, FaUsers } from "react-icons/fa";
 import { Link } from "react-router";
@@ -6,8 +7,24 @@ import { toast } from "react-toastify";
 import useAdminAPI from "../api/useAdminAPI";
 import useDonationAPI from "../api/useDonationAPI";
 import useFundingAPI from "../api/useFundingAPI";
+import DonationAnalytics from "../components/charts/DonationAnalytics";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
+
+// Animation variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
 function Dashboard() {
   const { user } = useAuth();
@@ -106,284 +123,324 @@ function Dashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <motion.div 
+      className="space-y-8"
+      initial="initial"
+      animate="animate"
+      variants={staggerContainer}
+    >
       {/* Welcome Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-            <FaTint className="text-red-600" />
-            <span>Welcome back, {user?.name}!</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            {isDonor 
-              ? "Thank you for being part of our blood donation community. Every donation counts and helps save lives."
-              : `Welcome to your ${user?.role} dashboard. Here you can see important statistics and manage the platform.`
-            }
-          </p>
-        </CardContent>
-      </Card>
+      <motion.div variants={fadeInUp}>
+        <Card className="hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+              <FaTint className="text-red-600" />
+              <span>Welcome back, {user?.name}!</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              {isDonor 
+                ? "Thank you for being part of our blood donation community. Every donation counts and helps save lives."
+                : `Welcome to your ${user?.role} dashboard. Here you can see important statistics and manage the platform.`
+              }
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Statistics Cards for Admin/Volunteer */}
       {isAdminOrVolunteer && dashboardStats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          variants={fadeInUp}
+        >
           {/* Total Users */}
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-600 text-sm font-medium mb-1">Total Users</p>
-                  <p className="text-3xl font-bold text-blue-900">{dashboardStats.totalUsers}</p>
-                  <p className="text-blue-700 text-sm">Active Donors</p>
+          <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-600 text-sm font-medium mb-1">Total Users</p>
+                    <p className="text-3xl font-bold text-blue-900">{dashboardStats.totalUsers}</p>
+                    <p className="text-blue-700 text-sm">Active Donors</p>
+                  </div>
+                  <motion.div 
+                    className="bg-blue-500 p-3 rounded-full"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <FaUsers className="h-6 w-6 text-white" />
+                  </motion.div>
                 </div>
-                <div className="bg-blue-500 p-3 rounded-full">
-                  <FaUsers className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Total Blood Donation Requests */}
-          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium mb-1">Blood Requests</p>
-                  <p className="text-3xl font-bold text-red-900">{dashboardStats.totalRequests}</p>
-                  <p className="text-red-700 text-sm">All Time</p>
+          <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-600 text-sm font-medium mb-1">Blood Requests</p>
+                    <p className="text-3xl font-bold text-red-900">{dashboardStats.totalRequests}</p>
+                    <p className="text-red-700 text-sm">All Time</p>
+                  </div>
+                  <motion.div 
+                    className="bg-red-500 p-3 rounded-full"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <FaHandHoldingHeart className="h-6 w-6 text-white" />
+                  </motion.div>
                 </div>
-                <div className="bg-red-500 p-3 rounded-full">
-                  <FaHandHoldingHeart className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Total Funding */}
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-600 text-sm font-medium mb-1">Total Funding</p>
-                  <p className="text-3xl font-bold text-green-900">${dashboardStats.totalFunding}</p>
-                  <p className="text-green-700 text-sm">Raised</p>
+          <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-600 text-sm font-medium mb-1">Total Funding</p>
+                    <p className="text-3xl font-bold text-green-900">${dashboardStats.totalFunding}</p>
+                    <p className="text-green-700 text-sm">Raised</p>
+                  </div>
+                  <motion.div 
+                    className="bg-green-500 p-3 rounded-full"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <FaMoneyBillWave className="h-6 w-6 text-white" />
+                  </motion.div>
                 </div>
-                <div className="bg-green-500 p-3 rounded-full">
-                  <FaMoneyBillWave className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Analytics Charts for Admin/Volunteer */}
+      {isAdminOrVolunteer && (
+        <motion.div variants={fadeInUp}>
+          <DonationAnalytics />
+        </motion.div>
       )}
 
       {/* Quick Actions for Admin/Volunteer */}
       {isAdminOrVolunteer && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Button asChild className="h-20 flex-col">
-                <Link to="/dashboard/all-blood-donation-request">
-                  <FaTint className="h-6 w-6 mb-2" />
-                  Manage Blood Requests
-                </Link>
-              </Button>
-              
-              <Button asChild variant="outline" className="h-20 flex-col">
-                <Link to="/dashboard/content-management">
-                  <FaEdit className="h-6 w-6 mb-2" />
-                  Content Management
-                </Link>
-              </Button>
+        <motion.div variants={fadeInUp}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild className="h-20 flex-col w-full">
+                    <Link to="/dashboard/all-blood-donation-request">
+                      <FaTint className="h-6 w-6 mb-2" />
+                      Manage Blood Requests
+                    </Link>
+                  </Button>
+                </motion.div>
+                
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button asChild variant="outline" className="h-20 flex-col w-full">
+                    <Link to="/dashboard/content-management">
+                      <FaEdit className="h-6 w-6 mb-2" />
+                      Content Management
+                    </Link>
+                  </Button>
+                </motion.div>
 
-              {user?.role === 'admin' && (
-                <>
-                  <Button asChild variant="outline" className="h-20 flex-col">
-                    <Link to="/dashboard/all-users">
-                      <FaUsers className="h-6 w-6 mb-2" />
-                      Manage Users
-                    </Link>
-                  </Button>
-                  
-                  <Button asChild variant="outline" className="h-20 flex-col">
-                    <Link to="/dashboard/funding">
-                      <FaMoneyBillWave className="h-6 w-6 mb-2" />
-                      View Funding
-                    </Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                {user?.role === 'admin' && (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button asChild variant="outline" className="h-20 flex-col w-full">
+                      <Link to="/dashboard/all-users">
+                        <FaUsers className="h-6 w-6 mb-2" />
+                        Manage Users
+                      </Link>
+                    </Button>
+                  </motion.div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* Recent Donation Requests Section (for donors only) */}
       {isDonor && recentRequests && recentRequests.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                Recent Donation Requests
-              </CardTitle>
-              <Button asChild>
-                <Link to="/dashboard/my-donation-requests">
-                  View My All Requests
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Recipient Name</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Date & Time</TableHead>
-                    <TableHead>Blood Group</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Donor Info</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentRequests.map((request) => (
-                    <TableRow key={request._id}>
-                      <TableCell className="font-medium">
-                        {request.recipientName}
-                      </TableCell>
-                      <TableCell>
-                        {request.recipientDistrict}, {request.recipientUpazila}
-                      </TableCell>
-                      <TableCell>
-                        {formatDateTime(request.donationDate, request.donationTime)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className="bg-red-100 text-red-800">
-                          {request.bloodGroup}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusBadge(request.donationStatus)}>
-                          {request.donationStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {request.donationStatus === 'inprogress' && request.donorInfo ? (
-                          <div className="text-sm">
-                            <div className="font-medium">{request.donorInfo.name}</div>
-                            <div className="text-gray-500">{request.donorInfo.email}</div>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          {/* Edit Button */}
-                          <Button asChild size="sm" variant="outline">
-                            <Link to={`/dashboard/edit-donation-request/${request._id}`}>
-                              <FaEdit className="h-4 w-4" />
-                            </Link>
-                          </Button>
-
-                          {/* View Button */}
-                          <Button asChild size="sm" variant="outline">
-                            <Link to={`/donation-requests/${request._id}`}>
-                              <FaEye className="h-4 w-4" />
-                            </Link>
-                          </Button>
-
-                          {/* Delete Button */}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-red-600 hover:text-red-700"
-                            onClick={() => {
-                              setSelectedRequestId(request._id);
-                              setShowDeleteModal(true);
-                            }}
-                          >
-                            <FaTrash className="h-4 w-4" />
-                          </Button>
-
-                          {/* Status Action Buttons */}
-                          {request.donationStatus === 'inprogress' && (
-                            <>
-                              <Button
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700"
-                                onClick={() => handleStatusUpdate(request._id, 'done')}
-                              >
-                                Done
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 hover:text-red-700"
-                                onClick={() => handleStatusUpdate(request._id, 'canceled')}
-                              >
-                                Cancel
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </TableCell>
+        <motion.div variants={fadeInUp}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  Recent Donation Requests
+                </CardTitle>
+                <Button asChild>
+                  <Link to="/dashboard/my-donation-requests">
+                    View My All Requests
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Recipient Name</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Date & Time</TableHead>
+                      <TableHead>Blood Group</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Donor Info</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {recentRequests.map((request) => (
+                      <TableRow key={request._id}>
+                        <TableCell className="font-medium">
+                          {request.recipientName}
+                        </TableCell>
+                        <TableCell>
+                          {request.recipientDistrict}, {request.recipientUpazila}
+                        </TableCell>
+                        <TableCell>
+                          {formatDateTime(request.donationDate, request.donationTime)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className="bg-red-100 text-red-800">
+                            {request.bloodGroup}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusBadge(request.donationStatus)}>
+                            {request.donationStatus}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {request.donationStatus === 'inprogress' && request.donorInfo ? (
+                            <div className="text-sm">
+                              <div className="font-medium">{request.donorInfo.name}</div>
+                              <div className="text-gray-500">{request.donorInfo.email}</div>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            {/* Edit Button */}
+                            <Button asChild size="sm" variant="outline">
+                              <Link to={`/dashboard/edit-donation-request/${request._id}`}>
+                                <FaEdit className="h-4 w-4" />
+                              </Link>
+                            </Button>
+
+                            {/* View Button */}
+                            <Button asChild size="sm" variant="outline">
+                              <Link to={`/donation-requests/${request._id}`}>
+                                <FaEye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+
+                            {/* Delete Button */}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => {
+                                setSelectedRequestId(request._id);
+                                setShowDeleteModal(true);
+                              }}
+                            >
+                              <FaTrash className="h-4 w-4" />
+                            </Button>
+
+                            {/* Status Action Buttons */}
+                            {request.donationStatus === 'inprogress' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() => handleStatusUpdate(request._id, 'done')}
+                                >
+                                  Done
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-red-600 hover:text-red-700"
+                                  onClick={() => handleStatusUpdate(request._id, 'canceled')}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* No Requests Message (for donors only) */}
       {isDonor && recentRequests && recentRequests.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <FaTint className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Donation Requests Yet
-            </h3>
-            <p className="text-gray-500 mb-6">
-              You haven't created any donation requests yet. Create your first request to help someone in need.
-            </p>
-            <Button asChild>
-              <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
-                <FaPlus className="h-4 w-4" />
-                <span>Create Donation Request</span>
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div variants={fadeInUp}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardContent className="text-center py-12">
+              <FaTint className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No Donation Requests Yet
+              </h3>
+              <p className="text-gray-500 mb-6">
+                You haven't created any donation requests yet. Create your first request to help someone in need.
+              </p>
+              <Button asChild>
+                <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
+                  <FaPlus className="h-4 w-4" />
+                  <span>Create Donation Request</span>
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* Error State */}
       {error && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <div className="text-red-600 mb-4">
-              <FaTint className="mx-auto h-12 w-12" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Failed to Load Dashboard
-            </h3>
-            <p className="text-gray-500 mb-6">
-              There was an error loading your dashboard data. Please try again.
-            </p>
-            <Button onClick={() => isDonor ? refetchRequests() : refetchStats()}>
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div variants={fadeInUp}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardContent className="text-center py-12">
+              <div className="text-red-600 mb-4">
+                <FaTint className="mx-auto h-12 w-12" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Failed to Load Dashboard
+              </h3>
+              <p className="text-gray-500 mb-6">
+                There was an error loading your dashboard data. Please try again.
+              </p>
+              <Button onClick={() => isDonor ? refetchRequests() : refetchStats()}>
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -414,7 +471,7 @@ function Dashboard() {
           </div>
         </div>
       </Modal>
-    </div>
+    </motion.div>
   );
 }
 
