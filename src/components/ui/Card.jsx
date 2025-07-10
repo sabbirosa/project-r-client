@@ -47,7 +47,7 @@ const CardDescription = forwardRef(({ className, children, ...props }, ref) => (
 const CardContent = forwardRef(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("p-6 pt-0", className)}
+    className={cn("p-6", className)}
     {...props}
   >
     {children}
