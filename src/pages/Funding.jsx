@@ -1,6 +1,5 @@
 import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaCalendar, FaCreditCard, FaDonate, FaMoneyBillWave, FaPlus, FaUser } from "react-icons/fa";
@@ -17,7 +16,8 @@ const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : 
 function PaymentForm({ amount, onSuccess, onCancel }) {
   const stripe = useStripe();
   const elements = useElements();
-  const fundingAPI = useFundingAPI();
+  const { useCreateFunding } = useFundingAPI();
+  const { mutateAsync: createFundingMutation } = useCreateFunding();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardError, setCardError] = useState(null);
@@ -98,7 +98,7 @@ function PaymentForm({ amount, onSuccess, onCancel }) {
         donorEmail: user?.email,
       };
 
-      await fundingAPI.createFunding(fundingData);
+      await createFundingMutation(fundingData);
       
       toast.success('Thank you for your donation!');
       onSuccess();
@@ -226,29 +226,23 @@ function Funding() {
   const itemsPerPage = 10;
 
   // Fetch funding records
+  const { useGetAllFunding } = useFundingAPI();
   const {
     data: fundingData,
     isLoading,
     error,
     refetch
-  } = useQuery({
-    queryKey: ['fundingRecords', currentPage],
-    queryFn: () => fundingAPI.getAllFunding({
-      page: currentPage,
-      limit: itemsPerPage
-    }),
-    enabled: !!user
+  } = useGetAllFunding({
+    page: currentPage,
+    limit: itemsPerPage
   });
 
   // Fetch funding statistics
+  const { useGetFundingStats } = useFundingAPI();
   const {
     data: fundingStats,
     isLoading: statsLoading
-  } = useQuery({
-    queryKey: ['fundingStats'],
-    queryFn: () => fundingAPI.getFundingStats(),
-    enabled: !!user
-  });
+  } = useGetFundingStats();
 
   // Form for donation amount
   const {

@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -47,16 +46,11 @@ const scaleIn = {
 
 function BlogDetails() {
   const { id } = useParams();
-  const publicAPI = usePublicAPI();
+  const { useGetBlogById } = usePublicAPI();
   const [showShareModal, setShowShareModal] = useState(false);
 
   // Fetch single blog
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["blog", id],
-    queryFn: () => publicAPI.getBlogById(id),
-    enabled: !!id,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
+  const { data, isLoading, isError, error } = useGetBlogById(id);
 
   const blog = data?.blog;
 

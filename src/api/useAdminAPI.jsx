@@ -1,135 +1,265 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 
 function useAdminAPI() {
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
-  // User management
-  const getAllUsers = async (params = {}) => {
-    const response = await axiosSecure.get("/admin/users", { params });
-    return response.data;
+  // GET requests using useQuery
+  const useGetAllUsers = (params = {}) => {
+    return useQuery({
+      queryKey: ["admin", "users", params],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/users", { params });
+        return response.data;
+      },
+    });
   };
 
-  const updateUserStatus = async (userId, status) => {
-    const response = await axiosSecure.patch(`/admin/users/${userId}/status`, { status });
-    return response.data;
+  const useGetAllBlogs = (params = {}) => {
+    return useQuery({
+      queryKey: ["admin", "blogs", params],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/blogs", { params });
+        return response.data;
+      },
+    });
   };
 
-  const updateUserRole = async (userId, role) => {
-    const response = await axiosSecure.patch(`/admin/users/${userId}/role`, { role });
-    return response.data;
+  const useGetBlogById = (blogId) => {
+    return useQuery({
+      queryKey: ["admin", "blogs", "detail", blogId],
+      queryFn: async () => {
+        const response = await axiosSecure.get(`/admin/blogs/${blogId}`);
+        return response.data;
+      },
+      enabled: !!blogId, // Only run query if blogId is provided
+    });
   };
 
-  const deleteUser = async (userId) => {
-    const response = await axiosSecure.delete(`/admin/users/${userId}`);
-    return response.data;
+  const useGetDashboardStats = () => {
+    return useQuery({
+      queryKey: ["admin", "dashboard", "stats"],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/dashboard/stats");
+        return response.data;
+      },
+    });
   };
 
-  // Blog management
-  const getAllBlogs = async (params = {}) => {
-    const response = await axiosSecure.get("/admin/blogs", { params });
-    return response.data;
+  const useGetAnalyticsData = (params = {}) => {
+    return useQuery({
+      queryKey: ["admin", "analytics", params],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/analytics", { params });
+        return response.data;
+      },
+    });
   };
 
-  const getBlogById = async (blogId) => {
-    const response = await axiosSecure.get(`/admin/blogs/${blogId}`);
-    return response.data;
+  const useGetBloodGroupDistribution = () => {
+    return useQuery({
+      queryKey: ["admin", "analytics", "blood-groups"],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/analytics/blood-groups");
+        return response.data;
+      },
+    });
   };
 
-  const createBlog = async (blogData) => {
-    const response = await axiosSecure.post("/admin/blogs", blogData);
-    return response.data;
+  const useGetTrendData = (timeframe = 'daily') => {
+    return useQuery({
+      queryKey: ["admin", "analytics", "trends", timeframe],
+      queryFn: async () => {
+        const response = await axiosSecure.get(`/admin/analytics/trends?timeframe=${timeframe}`);
+        return response.data;
+      },
+    });
   };
 
-  const updateBlog = async (blogId, blogData) => {
-    const response = await axiosSecure.put(`/admin/blogs/${blogId}`, blogData);
-    return response.data;
+  const useGetAllFunding = (params = {}) => {
+    return useQuery({
+      queryKey: ["admin", "funding", params],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/funding", { params });
+        return response.data;
+      },
+    });
   };
 
-  const deleteBlog = async (blogId) => {
-    const response = await axiosSecure.delete(`/admin/blogs/${blogId}`);
-    return response.data;
+  const useGetFundingStats = () => {
+    return useQuery({
+      queryKey: ["admin", "funding", "stats"],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/funding/stats");
+        return response.data;
+      },
+    });
   };
 
-  const updateBlogStatus = async (blogId, status) => {
-    const response = await axiosSecure.patch(`/admin/blogs/${blogId}/status`, { status });
-    return response.data;
+  const useGetAllDonationRequests = (params = {}) => {
+    return useQuery({
+      queryKey: ["admin", "donations", params],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/donations", { params });
+        return response.data;
+      },
+    });
   };
 
-  // Dashboard statistics
-  const getDashboardStats = async () => {
-    const response = await axiosSecure.get("/admin/dashboard/stats");
-    return response.data;
+  // Mutation requests using useMutation
+  const useUpdateUserStatus = () => {
+    return useMutation({
+      mutationFn: async ({ userId, status }) => {
+        const response = await axiosSecure.patch(`/admin/users/${userId}/status`, { status });
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate users queries after status update
+        queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
+      },
+    });
   };
 
-  // Analytics data
-  const getAnalyticsData = async (params = {}) => {
-    const response = await axiosSecure.get("/admin/analytics", { params });
-    return response.data;
+  const useUpdateUserRole = () => {
+    return useMutation({
+      mutationFn: async ({ userId, role }) => {
+        const response = await axiosSecure.patch(`/admin/users/${userId}/role`, { role });
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate users queries after role update
+        queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
+      },
+    });
   };
 
-  const getBloodGroupDistribution = async () => {
-    const response = await axiosSecure.get("/admin/analytics/blood-groups");
-    return response.data;
+  const useDeleteUser = () => {
+    return useMutation({
+      mutationFn: async (userId) => {
+        const response = await axiosSecure.delete(`/admin/users/${userId}`);
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate users queries after deletion
+        queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
+      },
+    });
   };
 
-  const getTrendData = async (timeframe = 'daily') => {
-    const response = await axiosSecure.get(`/admin/analytics/trends?timeframe=${timeframe}`);
-    return response.data;
+  const useCreateBlog = () => {
+    return useMutation({
+      mutationFn: async (blogData) => {
+        const response = await axiosSecure.post("/admin/blogs", blogData);
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate blogs queries after creation
+        queryClient.invalidateQueries({ queryKey: ["admin", "blogs"] });
+        queryClient.invalidateQueries({ queryKey: ["public", "blogs"] });
+      },
+    });
   };
 
-  // Funding management
-  const getAllFunding = async (params = {}) => {
-    const response = await axiosSecure.get("/admin/funding", { params });
-    return response.data;
+  const useUpdateBlog = () => {
+    return useMutation({
+      mutationFn: async ({ blogId, blogData }) => {
+        const response = await axiosSecure.put(`/admin/blogs/${blogId}`, blogData);
+        return response.data;
+      },
+      onSuccess: (data, variables) => {
+        // Invalidate blog queries after update
+        queryClient.invalidateQueries({ queryKey: ["admin", "blogs", "detail", variables.blogId] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "blogs"] });
+        queryClient.invalidateQueries({ queryKey: ["public", "blogs"] });
+      },
+    });
   };
 
-  const getFundingStats = async () => {
-    const response = await axiosSecure.get("/funding/stats");
-    return response.data;
+  const useDeleteBlog = () => {
+    return useMutation({
+      mutationFn: async (blogId) => {
+        const response = await axiosSecure.delete(`/admin/blogs/${blogId}`);
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate blogs queries after deletion
+        queryClient.invalidateQueries({ queryKey: ["admin", "blogs"] });
+        queryClient.invalidateQueries({ queryKey: ["public", "blogs"] });
+      },
+    });
   };
 
-  // General admin operations - reusing existing donation API routes
-  const getAllDonationRequests = async (params = {}) => {
-    const response = await axiosSecure.get("/donations", { params });
-    return response.data;
+  const useUpdateBlogStatus = () => {
+    return useMutation({
+      mutationFn: async ({ blogId, status }) => {
+        const response = await axiosSecure.patch(`/admin/blogs/${blogId}/status`, { status });
+        return response.data;
+      },
+      onSuccess: (data, variables) => {
+        // Invalidate blog queries after status update
+        queryClient.invalidateQueries({ queryKey: ["admin", "blogs", "detail", variables.blogId] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "blogs"] });
+        queryClient.invalidateQueries({ queryKey: ["public", "blogs"] });
+      },
+    });
   };
 
-  const updateDonationStatus = async (donationId, status) => {
-    const response = await axiosSecure.patch(`/donations/${donationId}/status`, { status });
-    return response.data;
+  const useUpdateDonationStatus = () => {
+    return useMutation({
+      mutationFn: async ({ donationId, status }) => {
+        const response = await axiosSecure.patch(`/donations/${donationId}/status`, { status });
+        return response.data;
+      },
+      onSuccess: (data, variables) => {
+        // Invalidate donation queries after status update
+        queryClient.invalidateQueries({ queryKey: ["admin", "donations"] });
+        queryClient.invalidateQueries({ queryKey: ["donations"] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
+      },
+    });
   };
 
-  const deleteDonationRequest = async (donationId) => {
-    const response = await axiosSecure.delete(`/donations/${donationId}`);
-    return response.data;
+  const useDeleteDonationRequest = () => {
+    return useMutation({
+      mutationFn: async (donationId) => {
+        const response = await axiosSecure.delete(`/donations/${donationId}`);
+        return response.data;
+      },
+      onSuccess: () => {
+        // Invalidate donation queries after deletion
+        queryClient.invalidateQueries({ queryKey: ["admin", "donations"] });
+        queryClient.invalidateQueries({ queryKey: ["donations"] });
+        queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
+      },
+    });
   };
 
   return {
-    // User management
-    getAllUsers,
-    updateUserStatus,
-    updateUserRole,
-    deleteUser,
-    // Blog management
-    getAllBlogs,
-    getBlogById,
-    createBlog,
-    updateBlog,
-    deleteBlog,
-    updateBlogStatus,
-    // Dashboard statistics
-    getDashboardStats,
-    // Analytics
-    getAnalyticsData,
-    getBloodGroupDistribution,
-    getTrendData,
-    // Funding management
-    getAllFunding,
-    getFundingStats,
-    // General admin operations
-    getAllDonationRequests,
-    updateDonationStatus,
-    deleteDonationRequest,
+    // Query hooks
+    useGetAllUsers,
+    useGetAllBlogs,
+    useGetBlogById,
+    useGetDashboardStats,
+    useGetAnalyticsData,
+    useGetBloodGroupDistribution,
+    useGetTrendData,
+    useGetAllFunding,
+    useGetFundingStats,
+    useGetAllDonationRequests,
+    // Mutation hooks
+    useUpdateUserStatus,
+    useUpdateUserRole,
+    useDeleteUser,
+    useCreateBlog,
+    useUpdateBlog,
+    useDeleteBlog,
+    useUpdateBlogStatus,
+    useUpdateDonationStatus,
+    useDeleteDonationRequest,
   };
 }
 

@@ -58,10 +58,13 @@ function Register() {
   };
 
   // Upload avatar using the improved API
+  const { useUploadImage } = usePublicAPI();
+  const { mutateAsync: uploadImageMutation } = useUploadImage();
+
   const uploadAvatarToImgBB = async (imageFile) => {
     try {
       setUploadingAvatar(true);
-      const response = await publicAPI.uploadImage(imageFile);
+      const response = await uploadImageMutation(imageFile);
       return response.data.url;
     } catch (error) {
       console.error("Error uploading avatar:", error);

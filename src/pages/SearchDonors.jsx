@@ -36,7 +36,7 @@ const scaleIn = {
 };
 
 function SearchDonors() {
-  const { searchDonors } = usePublicAPI();
+  const { useSearchDonors } = usePublicAPI();
   const resultsRef = useRef(null);
   
   const [searchForm, setSearchForm] = useState({
@@ -44,11 +44,14 @@ function SearchDonors() {
     district: "",
     upazila: ""
   });
-  const [donors, setDonors] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [searchParams, setSearchParams] = useState(null);
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // Use the search hook with conditional execution
+  const { data, isLoading: isSearching, isError, error } = useSearchDonors(searchParams);
+  const donors = data?.donors || [];
+  const hasSearched = searchParams !== null;
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -68,21 +71,13 @@ function SearchDonors() {
   };
 
   // Handle search form submission
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
-    setIsSearching(true);
-
-    try {
-      const result = await searchDonors(searchForm);
-      setDonors(result.donors || []);
-      setHasSearched(true);
-    } catch (error) {
-      console.error("Search error:", error);
-      setDonors([]);
-      setHasSearched(true);
-    } finally {
-      setIsSearching(false);
-    }
+    
+    // Set search parameters to trigger the query
+    setSearchParams({
+      ...searchForm
+    });
   };
 
   // Generate and download PDF

@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { FaEdit, FaEye, FaHandHoldingHeart, FaMoneyBillWave, FaPlus, FaTint, FaTrash, FaUsers } from "react-icons/fa";
@@ -33,65 +32,82 @@ function Dashboard() {
   const fundingAPI = useFundingAPI();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
   // Fetch data based on user role
   const isDonor = user?.role === 'donor';
   const isAdminOrVolunteer = user?.role === 'admin' || user?.role === 'volunteer';
 
-  // Fetch recent donation requests (for donors only)
+  // Get API hooks
+  const donationQueries = useDonationAPI();
+  const adminQueries = useAdminAPI();
+  const donationMutations = useDonationAPI();
+
+  // Fetch recent donation requests (for donors only) - conditionally enabled
+  const recentRequestsQuery = donationQueries.useGetRecentRequests(3);
   const {
     data: recentRequests,
     isLoading: requestsLoading,
     error: requestsError,
     refetch: refetchRequests
-  } = useQuery({
-    queryKey: ['recentDonationRequests'],
-    queryFn: () => donationAPI.getRecentRequests(3),
-    enabled: !!user && isDonor
-  });
+  } = {
+    ...recentRequestsQuery,
+    data: isDonor ? recentRequestsQuery.data : null,
+    isLoading: isDonor ? recentRequestsQuery.isLoading : false,
+    error: isDonor ? recentRequestsQuery.error : null,
+    refetch: recentRequestsQuery.refetch
+  };
 
-  // Fetch dashboard statistics (for admin/volunteer)
+  // Fetch dashboard statistics (for admin/volunteer) - conditionally enabled
+  const dashboardStatsQuery = adminQueries.useGetDashboardStats();
   const {
     data: dashboardStats,
     isLoading: statsLoading,
     error: statsError,
     refetch: refetchStats
-  } = useQuery({
-    queryKey: ['dashboardStats'],
-    queryFn: () => adminAPI.getDashboardStats(),
-    enabled: !!user && isAdminOrVolunteer
-  });
+  } = {
+    ...dashboardStatsQuery,
+    data: isAdminOrVolunteer ? dashboardStatsQuery.data : null,
+    isLoading: isAdminOrVolunteer ? dashboardStatsQuery.isLoading : false,
+    error: isAdminOrVolunteer ? dashboardStatsQuery.error : null,
+    refetch: dashboardStatsQuery.refetch
+  };
+
+  // Get mutation hooks
+  const { mutate: updateStatusMutation } = donationMutations.useUpdateStatus();
+  const { mutate: deleteRequestMutation, isPending: isDeletingRequest } = donationMutations.useDeleteRequest();
 
   // Handle status update (done/cancel)
-  const handleStatusUpdate = async (requestId, newStatus) => {
-    try {
-      await donationAPI.updateStatus(requestId, newStatus);
-      toast.success(`Request ${newStatus === 'done' ? 'marked as completed' : 'cancelled'} successfully!`);
-      refetchRequests();
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update request status');
-    }
+  const handleStatusUpdate = (requestId, newStatus) => {
+    updateStatusMutation(
+      { id: requestId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success(`Request ${newStatus === 'done' ? 'marked as completed' : 'cancelled'} successfully!`);
+          refetchRequests();
+        },
+        onError: (error) => {
+          console.error('Error updating status:', error);
+          toast.error('Failed to update request status');
+        }
+      }
+    );
   };
 
   // Handle delete request
-  const handleDeleteRequest = async () => {
+  const handleDeleteRequest = () => {
     if (!selectedRequestId) return;
     
-    try {
-      setIsDeleting(true);
-      await donationAPI.deleteRequest(selectedRequestId);
-      toast.success('Donation request deleted successfully!');
-      setShowDeleteModal(false);
-      setSelectedRequestId(null);
-      refetchRequests();
-    } catch (error) {
-      console.error('Error deleting request:', error);
-      toast.error('Failed to delete donation request');
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteRequestMutation(selectedRequestId, {
+      onSuccess: () => {
+        toast.success('Donation request deleted successfully!');
+        setShowDeleteModal(false);
+        setSelectedRequestId(null);
+        refetchRequests();
+      },
+      onError: (error) => {
+        console.error('Error deleting request:', error);
+        toast.error('Failed to delete donation request');
+      }
+    });
   };
 
   // Get status badge variant
@@ -457,16 +473,16 @@ function Dashboard() {
             <Button
               variant="outline"
               onClick={() => setShowDeleteModal(false)}
-              disabled={isDeleting}
+              disabled={isDeletingRequest}
             >
               Cancel
             </Button>
             <Button
               className="bg-red-600 hover:bg-red-700"
               onClick={handleDeleteRequest}
-              disabled={isDeleting}
+              disabled={isDeletingRequest}
             >
-              {isDeleting ? <LoadingSpinner size="sm" /> : 'Delete'}
+              {isDeletingRequest ? <LoadingSpinner size="sm" /> : 'Delete'}
             </Button>
           </div>
         </div>

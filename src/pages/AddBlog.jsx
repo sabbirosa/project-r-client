@@ -10,10 +10,11 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner
 
 function AddBlog() {
   const navigate = useNavigate();
-  const adminAPI = useAdminAPI();
-  const publicAPI = usePublicAPI();
+  const { useCreateBlog } = useAdminAPI();
+  const { mutate: createBlogMutation, isPending: isSubmitting } = useCreateBlog();
+  const { useUploadImage } = usePublicAPI();
+  const { mutateAsync: uploadImageMutation } = useUploadImage();
   
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
   const [content, setContent] = useState("");
@@ -66,13 +67,14 @@ function AddBlog() {
   };
 
   // Handle image upload
+
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setIsUploadingImage(true);
     try {
-      const response = await publicAPI.uploadImage(file);
+      const response = await uploadImageMutation(file);
       
       if (response.success && response.data.url) {
         const imageUrl = response.data.url;
@@ -101,29 +103,28 @@ function AddBlog() {
   };
 
   // Handle form submission
-  const onSubmit = async (data) => {
+
+  const onSubmit = (data) => {
     // Validate content
     if (!content || content.trim().length < 50) {
       toast.error('Blog content must be at least 50 characters long');
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      await adminAPI.createBlog({
-        title: data.title,
-        thumbnail: data.thumbnail || "",
-        content: content
-      });
-
-      toast.success('Blog created successfully!');
-      navigate('/dashboard/content-management');
-    } catch (error) {
-      console.error('Error creating blog:', error);
-      toast.error(error.response?.data?.message || 'Failed to create blog');
-    } finally {
-      setIsSubmitting(false);
-    }
+    createBlogMutation({
+      title: data.title,
+      thumbnail: data.thumbnail || "",
+      content: content
+    }, {
+      onSuccess: () => {
+        toast.success('Blog created successfully!');
+        navigate('/dashboard/content-management');
+      },
+      onError: (error) => {
+        console.error('Error creating blog:', error);
+        toast.error(error.response?.data?.message || 'Failed to create blog');
+      }
+    });
   };
 
   return (

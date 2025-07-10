@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaEdit, FaEye, FaFilter, FaTint, FaTrash } from "react-icons/fa";
 import { Link } from "react-router";
@@ -18,55 +17,60 @@ function AllBloodDonationRequests() {
   const [statusFilter, setStatusFilter] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   
   const itemsPerPage = 10;
 
   // Fetch all donation requests with pagination and filtering
+  const { useGetAllRequests } = useDonationAPI();
   const {
     data: requestsData,
     isLoading,
     error,
     refetch
-  } = useQuery({
-    queryKey: ['allDonationRequests', currentPage, statusFilter],
-    queryFn: () => donationAPI.getAllRequests({
-      page: currentPage,
-      limit: itemsPerPage,
-      status: statusFilter || undefined
-    }),
+  } = useGetAllRequests({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter || undefined
+  }, {
     enabled: !!user && (user.role === 'admin' || user.role === 'volunteer')
   });
 
   // Handle status update
-  const handleStatusUpdate = async (requestId, newStatus) => {
-    try {
-      await donationAPI.updateStatus(requestId, newStatus);
-      toast.success(`Request status updated to ${newStatus}!`);
-      refetch();
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update request status');
-    }
+  const { useUpdateStatus } = useDonationAPI();
+  const { mutate: updateStatusMutation } = useUpdateStatus();
+
+  const handleStatusUpdate = (requestId, newStatus) => {
+    updateStatusMutation({ requestId, status: newStatus }, {
+      onSuccess: () => {
+        toast.success(`Request status updated to ${newStatus}!`);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Error updating status:', error);
+        toast.error('Failed to update request status');
+      }
+    });
   };
 
   // Handle delete request (admin only)
-  const handleDeleteRequest = async () => {
+  const { useDeleteRequest } = useDonationAPI();
+  const { mutate: deleteRequestMutation, isPending: isDeleting } = useDeleteRequest();
+
+  const handleDeleteRequest = () => {
     if (!selectedRequestId) return;
     
-    setIsDeleting(true);
-    try {
-      await donationAPI.deleteRequest(selectedRequestId);
-      toast.success('Donation request deleted successfully!');
-      refetch();
-      setShowDeleteModal(false);
-      setSelectedRequestId(null);
-    } catch (error) {
-      console.error('Error deleting request:', error);
-      toast.error('Failed to delete donation request');
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteRequestMutation(selectedRequestId, {
+      onSuccess: () => {
+        toast.success('Donation request deleted successfully!');
+        refetch();
+        setShowDeleteModal(false);
+        setSelectedRequestId(null);
+      },
+      onError: (error) => {
+        console.error('Error deleting request:', error);
+        toast.error('Failed to delete donation request');
+      }
+    });
   };
 
   // Check if user can perform certain actions

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaCamera, FaEdit, FaSave, FaTimes, FaUpload } from "react-icons/fa";
@@ -33,18 +33,12 @@ function Profile() {
   } = useForm();
 
   // Fetch user profile data
+  const { useGetProfile } = useAuthAPI();
   const {
     data: profileData,
     isLoading,
     error
-  } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: async () => {
-      const response = await authAPI.getProfile();
-      return response.user; // Extract user from response
-    },
-    enabled: !!user
-  });
+  } = useGetProfile();
 
   // Watch district changes to filter upazilas
   const watchedDistrict = watch("district");
@@ -107,10 +101,13 @@ function Profile() {
   };
 
   // Upload avatar to ImageBB
+  const { useUploadImage } = usePublicAPI();
+  const { mutateAsync: uploadImageMutation } = useUploadImage();
+
   const uploadAvatar = async (imageFile) => {
     try {
       setUploadingImage(true);
-      const response = await publicAPI.uploadImage(imageFile);
+      const response = await uploadImageMutation(imageFile);
       return response.data.url;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -132,6 +129,9 @@ function Profile() {
   };
 
   // Handle form submission
+  const { useUpdateProfile } = useAuthAPI();
+  const { mutate: updateProfileMutation } = useUpdateProfile();
+
   const onSubmit = async (data) => {
     try {
       let avatarUrl = profileData?.avatar || "";
@@ -149,22 +149,27 @@ function Profile() {
         avatar: avatarUrl,
       };
 
-      // Call API to update profile
-      const response = await authAPI.updateProfile(updateData);
-      
-      // Update user data in context
-      await updateUserData();
-      
-      // Invalidate and refetch profile data
-      queryClient.invalidateQueries(['userProfile']);
-      
-      toast.success("Profile updated successfully!");
-      setIsEditing(false);
-      setAvatar(null);
+      updateProfileMutation(updateData, {
+        onSuccess: async () => {
+          // Update user data in context
+          await updateUserData();
+          
+          // Invalidate and refetch profile data
+          queryClient.invalidateQueries(['userProfile']);
+          
+          toast.success("Profile updated successfully!");
+          setIsEditing(false);
+          setAvatar(null);
+        },
+        onError: (error) => {
+          console.error("Profile update error:", error);
+          toast.error(error.response?.data?.message || "Failed to update profile");
+        }
+      });
       
     } catch (error) {
-      console.error("Profile update error:", error);
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      console.error("Avatar upload error:", error);
+      toast.error("Failed to upload avatar");
     }
   };
 

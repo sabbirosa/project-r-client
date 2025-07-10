@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { FaCalendarAlt, FaChartArea, FaChartBar, FaChartLine } from "react-icons/fa";
@@ -47,9 +46,8 @@ export default function DonationAnalytics() {
     const hasAnalyticsPermission = user && (user.role === 'admin' || user.role === 'volunteer');
 
     // Only make API calls if user has permission
-    const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useQuery({
-        queryKey: ['analytics', timeframe],
-        queryFn: () => adminAPI.getAnalytics({ timeframe }),
+    const { useGetAnalyticsData } = useAdminAPI();
+    const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useGetAnalyticsData({ timeframe }, {
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
             // Don't retry on permission errors
@@ -60,9 +58,8 @@ export default function DonationAnalytics() {
         }
     });
 
-    const { data: bloodGroupData, isLoading: bloodGroupLoading, error: bloodGroupError } = useQuery({
-        queryKey: ['analytics-blood-groups'],
-        queryFn: () => adminAPI.getBloodGroupAnalytics(),
+    const { useGetBloodGroupDistribution } = useAdminAPI();
+    const { data: bloodGroupData, isLoading: bloodGroupLoading, error: bloodGroupError } = useGetBloodGroupDistribution({
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
             if (error?.response?.status === 403 || error?.response?.status === 401) {
@@ -72,9 +69,8 @@ export default function DonationAnalytics() {
         }
     });
 
-    const { data: donationStats, isLoading: donationStatsLoading, error: donationStatsError } = useQuery({
-        queryKey: ['donation-stats'],
-        queryFn: () => donationAPI.getStats(),
+    const { useGetStats } = useDonationAPI();
+    const { data: donationStats, isLoading: donationStatsLoading, error: donationStatsError } = useGetStats({
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
             if (error?.response?.status === 403 || error?.response?.status === 401) {
@@ -84,9 +80,8 @@ export default function DonationAnalytics() {
         }
     });
 
-    const { data: fundingStats, isLoading: fundingStatsLoading, error: fundingStatsError } = useQuery({
-        queryKey: ['funding-stats'],
-        queryFn: () => fundingAPI.getStats(),
+    const { useGetFundingStats: useFundingStatsHook } = useFundingAPI();
+    const { data: fundingStats, isLoading: fundingStatsLoading, error: fundingStatsError } = useFundingStatsHook({
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
             if (error?.response?.status === 403 || error?.response?.status === 401) {

@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaEdit, FaEye, FaFilter, FaPlus, FaTint, FaTrash } from "react-icons/fa";
 import { Link } from "react-router";
@@ -16,55 +15,60 @@ function MyDonationRequests() {
   const [statusFilter, setStatusFilter] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   
   const itemsPerPage = 10;
 
   // Fetch donation requests with pagination and filtering
+  const { useGetMyRequests, useUpdateStatus, useDeleteRequest } = useDonationAPI();
+  
   const {
     data: requestsData,
     isLoading,
     error,
     refetch
-  } = useQuery({
-    queryKey: ['myDonationRequests', currentPage, statusFilter],
-    queryFn: () => donationAPI.getMyRequests({
-      page: currentPage,
-      limit: itemsPerPage,
-      status: statusFilter || undefined
-    }),
-    enabled: !!user
+  } = useGetMyRequests({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter || undefined
   });
 
+  // Get mutation hooks
+  const { mutate: updateStatusMutation } = useUpdateStatus();
+  const { mutate: deleteRequestMutation, isPending: isDeleting } = useDeleteRequest();
+
   // Handle status update (done/cancel)
-  const handleStatusUpdate = async (requestId, newStatus) => {
-    try {
-      await donationAPI.updateStatus(requestId, newStatus);
-      toast.success(`Request ${newStatus === 'done' ? 'marked as completed' : 'cancelled'} successfully!`);
-      refetch();
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update request status');
-    }
+  const handleStatusUpdate = (requestId, newStatus) => {
+    updateStatusMutation(
+      { id: requestId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success(`Request ${newStatus === 'done' ? 'marked as completed' : 'cancelled'} successfully!`);
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Error updating status:', error);
+          toast.error('Failed to update request status');
+        }
+      }
+    );
   };
 
   // Handle delete request
-  const handleDeleteRequest = async () => {
+  const handleDeleteRequest = () => {
     if (!selectedRequestId) return;
     
-    try {
-      setIsDeleting(true);
-      await donationAPI.deleteRequest(selectedRequestId);
-      toast.success('Donation request deleted successfully!');
-      setShowDeleteModal(false);
-      setSelectedRequestId(null);
-      refetch();
-    } catch (error) {
-      console.error('Error deleting request:', error);
-      toast.error('Failed to delete donation request');
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteRequestMutation(selectedRequestId, {
+      onSuccess: () => {
+        toast.success('Donation request deleted successfully!');
+        setShowDeleteModal(false);
+        setSelectedRequestId(null);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Error deleting request:', error);
+        toast.error('Failed to delete donation request');
+      }
+    });
   };
 
   // Handle filter change

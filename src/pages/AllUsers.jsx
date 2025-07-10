@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaCheck, FaFilter, FaTimes, FaUserShield, FaUsers } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -17,43 +16,55 @@ function AllUsers() {
   const itemsPerPage = 10;
 
   // Fetch users with pagination and filtering
+  const { useGetAllUsers, useUpdateUserStatus, useUpdateUserRole } = useAdminAPI();
+  
   const {
     data: usersData,
     isLoading,
     error,
     refetch
-  } = useQuery({
-    queryKey: ['allUsers', currentPage, statusFilter],
-    queryFn: () => adminAPI.getAllUsers({
-      page: currentPage,
-      limit: itemsPerPage,
-      status: statusFilter || undefined
-    }),
-    enabled: !!user && user.role === 'admin'
+  } = useGetAllUsers({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter || undefined
   });
 
+  // Get mutation hooks
+  const { mutate: updateStatusMutation } = useUpdateUserStatus();
+  const { mutate: updateRoleMutation } = useUpdateUserRole();
+
   // Handle user status update
-  const handleStatusUpdate = async (userId, newStatus) => {
-    try {
-      await adminAPI.updateUserStatus(userId, newStatus);
-      toast.success(`User ${newStatus} successfully!`);
-      refetch();
-    } catch (error) {
-      console.error('Error updating user status:', error);
-      toast.error('Failed to update user status');
-    }
+  const handleStatusUpdate = (userId, newStatus) => {
+    updateStatusMutation(
+      { userId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success(`User ${newStatus} successfully!`);
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Error updating user status:', error);
+          toast.error('Failed to update user status');
+        }
+      }
+    );
   };
 
   // Handle user role update
-  const handleRoleUpdate = async (userId, newRole) => {
-    try {
-      await adminAPI.updateUserRole(userId, newRole);
-      toast.success(`User role updated to ${newRole}!`);
-      refetch();
-    } catch (error) {
-      console.error('Error updating user role:', error);
-      toast.error('Failed to update user role');
-    }
+  const handleRoleUpdate = (userId, newRole) => {
+    updateRoleMutation(
+      { userId, role: newRole },
+      {
+        onSuccess: () => {
+          toast.success(`User role updated to ${newRole}!`);
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Error updating user role:', error);
+          toast.error('Failed to update user role');
+        }
+      }
+    );
   };
 
   if (isLoading) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaCalendarAlt, FaClock, FaHandHoldingHeart, FaHospital, FaMapMarkerAlt, FaTint, FaUser } from "react-icons/fa";
 import { Link, Navigate, useParams } from "react-router";
 import useDonationAPI from "../api/useDonationAPI";
@@ -9,61 +9,47 @@ import { useAuth } from "../contexts/AuthContext";
 function DonationRequestDetails() {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
-  const { getDonationDetails } = usePublicAPI();
-  const { confirmDonation } = useDonationAPI();
+  const { useGetDonationDetails } = usePublicAPI();
+  const { useConfirmDonation } = useDonationAPI();
   
-  const [request, setRequest] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isConfirming, setIsConfirming] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState("");
   const [confirmError, setConfirmError] = useState("");
 
-  // Fetch donation request details
-  useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const result = await getDonationDetails(id);
-        setRequest(result.request);
-      } catch (error) {
-        setError(error.message || "Failed to load request details");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch donation request details using the new hook
+  const { data, isLoading: loading, isError, error: queryError } = useGetDonationDetails(id);
+  const request = data?.request;
+  const error = isError ? (queryError?.message || "Failed to load request details") : "";
 
-    if (id) {
-      fetchDetails();
-    }
-  }, [id, getDonationDetails]);
+  // Get mutation hook for confirming donation
+  const { mutate: confirmDonationMutation, isPending: isConfirming } = useConfirmDonation();
 
   // Check if current user is the requester
   const isOwnRequest = user?._id === request?.requesterId;
 
   // Handle donation confirmation
-  const handleConfirmDonation = async () => {
-    setIsConfirming(true);
+  const handleConfirmDonation = () => {
     setConfirmError("");
     
-    try {
-      // Pass donor information to the API call
-      const donorInfo = {
-        donorName: user?.name,
-        donorEmail: user?.email
-      };
-      
-      const result = await confirmDonation(id, donorInfo);
-      setConfirmMessage(result.message);
-      setShowModal(false);
-      // Refresh the request data to show updated status
-      const updatedResult = await getDonationDetails(id);
-      setRequest(updatedResult.request);
-    } catch (error) {
-      setConfirmError(error.message || "Failed to confirm donation");
-    } finally {
-      setIsConfirming(false);
-    }
+    // Pass donor information to the mutation
+    const donorInfo = {
+      donorName: user?.name,
+      donorEmail: user?.email
+    };
+    
+    confirmDonationMutation(
+      { id, donorInfo },
+      {
+        onSuccess: (result) => {
+          setConfirmMessage(result.message);
+          setShowModal(false);
+          // The query will automatically refetch due to invalidation in the mutation
+        },
+        onError: (error) => {
+          setConfirmError(error.message || "Failed to confirm donation");
+        }
+      }
+    );
   };
 
   // Format date and time

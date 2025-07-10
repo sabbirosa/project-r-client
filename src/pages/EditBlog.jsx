@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import JoditEditor from "jodit-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,8 +13,7 @@ function EditBlog() {
   const navigate = useNavigate();
   const adminAPI = useAdminAPI();
   const publicAPI = usePublicAPI();
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
   const [content, setContent] = useState("");
@@ -32,11 +30,8 @@ function EditBlog() {
   const thumbnailUrl = watch("thumbnail");
 
   // Fetch the existing blog data
-  const { data: blogData, isLoading, isError, error } = useQuery({
-    queryKey: ["admin-blog", id],
-    queryFn: () => adminAPI.getBlogById(id),
-    enabled: !!id,
-  });
+  const { useGetBlogById } = useAdminAPI();
+  const { data: blogData, isLoading, isError, error } = useGetBlogById(id);
 
   // Pre-populate form when blog data is loaded
   useEffect(() => {
@@ -89,13 +84,16 @@ function EditBlog() {
   }, [thumbnailUrl, thumbnailPreview]);
 
   // Handle image upload to ImageBB
+  const { useUploadImage } = usePublicAPI();
+  const { mutateAsync: uploadImageMutation } = useUploadImage();
+
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setIsUploadingImage(true);
     try {
-      const response = await publicAPI.uploadImage(file);
+      const response = await uploadImageMutation(file);
       
       if (response.success && response.data.url) {
         const imageUrl = response.data.url;
@@ -124,29 +122,33 @@ function EditBlog() {
   };
 
   // Handle form submission
-  const onSubmit = async (data) => {
+  const { useUpdateBlog } = useAdminAPI();
+  const { mutate: updateBlogMutation, isPending: isSubmitting } = useUpdateBlog();
+
+  const onSubmit = (data) => {
     // Validate content
     if (!content || content.trim().length < 50) {
       toast.error('Blog content must be at least 50 characters long');
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      await adminAPI.updateBlog(id, {
+    updateBlogMutation({ 
+      id, 
+      blogData: {
         title: data.title,
         thumbnail: data.thumbnail || "",
         content: content
-      });
-
-      toast.success('Blog updated successfully!');
-      navigate('/dashboard/content-management');
-    } catch (error) {
-      console.error('Error updating blog:', error);
-      toast.error(error.response?.data?.message || 'Failed to update blog');
-    } finally {
-      setIsSubmitting(false);
-    }
+      }
+    }, {
+      onSuccess: () => {
+        toast.success('Blog updated successfully!');
+        navigate('/dashboard/content-management');
+      },
+      onError: (error) => {
+        console.error('Error updating blog:', error);
+        toast.error(error.response?.data?.message || 'Failed to update blog');
+      }
+    });
   };
 
   if (isLoading) {

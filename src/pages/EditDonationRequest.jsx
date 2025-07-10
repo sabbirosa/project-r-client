@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEdit } from "react-icons/fa";
@@ -7,10 +6,10 @@ import { toast } from "react-toastify";
 import useDonationAPI from "../api/useDonationAPI";
 import { Alert, AlertDescription, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Select, Textarea } from "../components/ui";
 import {
-  convertLocationIdsToNames,
-  convertLocationNamesToIds,
-  districts,
-  getUpazilasbyDistrictId
+    convertLocationIdsToNames,
+    convertLocationNamesToIds,
+    districts,
+    getUpazilasbyDistrictId
 } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
@@ -23,7 +22,6 @@ function EditDonationRequest() {
   
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -35,15 +33,12 @@ function EditDonationRequest() {
   } = useForm();
 
   // Fetch donation request data
+  const { useGetRequestById } = useDonationAPI();
   const {
     data: requestData,
     isLoading,
     error
-  } = useQuery({
-    queryKey: ['donationRequest', id],
-    queryFn: () => donationAPI.getRequestById(id),
-    enabled: !!id
-  });
+  } = useGetRequestById(id);
 
   // Watch district changes to filter upazilas
   const watchedDistrict = watch("recipientDistrict");
@@ -96,39 +91,40 @@ function EditDonationRequest() {
   };
 
   // Handle form submission
-  const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true);
+  const { useUpdateRequest } = useDonationAPI();
+  const { mutate: updateRequestMutation, isPending: isSubmitting } = useUpdateRequest();
 
-      // Use the new utility function to convert IDs to names
-      const { districtName, upazilaName } = convertLocationIdsToNames(
-        data.recipientDistrict,
-        data.recipientUpazila
-      );
+  const onSubmit = (data) => {
+    // Use the new utility function to convert IDs to names
+    const { districtName, upazilaName } = convertLocationIdsToNames(
+      data.recipientDistrict,
+      data.recipientUpazila
+    );
 
-      const requestData = {
-        requesterName: data.requesterName,
-        requesterEmail: data.requesterEmail,
-        recipientName: data.recipientName,
-        recipientDistrict: districtName,
-        recipientUpazila: upazilaName,
-        hospitalName: data.hospitalName,
-        fullAddress: data.fullAddress,
-        bloodGroup: data.bloodGroup,
-        donationDate: data.donationDate,
-        donationTime: data.donationTime,
-        requestMessage: data.requestMessage,
-      };
+    const requestData = {
+      requesterName: data.requesterName,
+      requesterEmail: data.requesterEmail,
+      recipientName: data.recipientName,
+      recipientDistrict: districtName,
+      recipientUpazila: upazilaName,
+      hospitalName: data.hospitalName,
+      fullAddress: data.fullAddress,
+      bloodGroup: data.bloodGroup,
+      donationDate: data.donationDate,
+      donationTime: data.donationTime,
+      requestMessage: data.requestMessage,
+    };
 
-      await donationAPI.updateRequest(id, requestData);
-      toast.success("Donation request updated successfully!");
-      navigate("/dashboard/my-donation-requests");
-    } catch (error) {
-      console.error("Error updating donation request:", error);
-      toast.error(error.response?.data?.message || "Failed to update donation request");
-    } finally {
-      setIsSubmitting(false);
-    }
+    updateRequestMutation({ id, requestData }, {
+      onSuccess: () => {
+        toast.success("Donation request updated successfully!");
+        navigate("/dashboard/my-donation-requests");
+      },
+      onError: (error) => {
+        console.error("Error updating donation request:", error);
+        toast.error(error.response?.data?.message || "Failed to update donation request");
+      }
+    });
   };
 
   if (isLoading) {

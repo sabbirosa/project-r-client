@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaEdit, FaEye, FaFilter, FaPlus, FaTrash } from "react-icons/fa";
 import { Link } from "react-router";
@@ -16,55 +15,58 @@ function ContentManagement() {
   const [statusFilter, setStatusFilter] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBlogId, setSelectedBlogId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   
   const itemsPerPage = 10;
 
   // Fetch blogs with pagination and filtering
+  const { useGetAllBlogs } = useAdminAPI();
   const {
     data: blogsData,
     isLoading,
     error,
     refetch
-  } = useQuery({
-    queryKey: ['adminBlogs', currentPage, statusFilter],
-    queryFn: () => adminAPI.getAllBlogs({
-      page: currentPage,
-      limit: itemsPerPage,
-      status: statusFilter || undefined
-    }),
-    enabled: !!user
+  } = useGetAllBlogs({
+    page: currentPage,
+    limit: itemsPerPage,
+    status: statusFilter || undefined
   });
 
   // Handle blog status update (publish/unpublish)
-  const handleStatusUpdate = async (blogId, newStatus) => {
-    try {
-      await adminAPI.updateBlogStatus(blogId, newStatus);
-      toast.success(`Blog ${newStatus === 'published' ? 'published' : 'unpublished'} successfully!`);
-      refetch();
-    } catch (error) {
-      console.error('Error updating blog status:', error);
-      toast.error('Failed to update blog status');
-    }
+  const { useUpdateBlogStatus } = useAdminAPI();
+  const { mutate: updateBlogStatusMutation } = useUpdateBlogStatus();
+
+  const handleStatusUpdate = (blogId, newStatus) => {
+    updateBlogStatusMutation({ blogId, status: newStatus }, {
+      onSuccess: () => {
+        toast.success(`Blog ${newStatus === 'published' ? 'published' : 'unpublished'} successfully!`);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Error updating blog status:', error);
+        toast.error('Failed to update blog status');
+      }
+    });
   };
 
   // Handle delete blog
-  const handleDelete = async () => {
+  const { useDeleteBlog } = useAdminAPI();
+  const { mutate: deleteBlogMutation, isPending: isDeleting } = useDeleteBlog();
+
+  const handleDelete = () => {
     if (!selectedBlogId) return;
     
-    setIsDeleting(true);
-    try {
-      await adminAPI.deleteBlog(selectedBlogId);
-      toast.success('Blog deleted successfully!');
-      setShowDeleteModal(false);
-      setSelectedBlogId(null);
-      refetch();
-    } catch (error) {
-      console.error('Error deleting blog:', error);
-      toast.error('Failed to delete blog');
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteBlogMutation(selectedBlogId, {
+      onSuccess: () => {
+        toast.success('Blog deleted successfully!');
+        setShowDeleteModal(false);
+        setSelectedBlogId(null);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Error deleting blog:', error);
+        toast.error('Failed to delete blog');
+      }
+    });
   };
 
   const confirmDelete = (blogId) => {

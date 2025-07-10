@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useState } from "react";
 import { FaCalendar, FaEye, FaSearch, FaUser } from "react-icons/fa";
@@ -7,17 +6,16 @@ import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, Input, LoadingSpinner, Pagination } from "../components/ui";
 
 function Blog() {
-  const publicAPI = usePublicAPI();
+  const { useGetPublishedBlogs } = usePublicAPI();
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const limit = 6;
 
   // Fetch blogs with search and pagination
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["published-blogs", page, searchQuery],
-    queryFn: () => publicAPI.getPublishedBlogs({ page, limit, search: searchQuery }),
-    keepPreviousData: true,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+  const { data, isLoading, isError, error } = useGetPublishedBlogs({ 
+    page, 
+    limit, 
+    search: searchQuery 
   });
 
   const handleSearch = (e) => {

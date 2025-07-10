@@ -1,42 +1,27 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaCalendarAlt, FaClock, FaEye, FaMapMarkerAlt, FaTint } from "react-icons/fa";
 import { Link } from "react-router";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, LoadingSpinner, Pagination } from "../components/ui";
 
 function BloodDonationRequests() {
-  const { getPendingDonations } = usePublicAPI();
+  const { useGetPendingDonations } = usePublicAPI();
   
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
 
-  // Fetch pending donation requests
-  const fetchRequests = async (page = 1) => {
-    setLoading(true);
-    try {
-      const result = await getPendingDonations({ page, limit: 12 });
-      setRequests(result.requests || []);
-      setTotalPages(result.totalPages || 1);
-      setTotal(result.total || 0);
-      setCurrentPage(page);
-    } catch (error) {
-      console.error("Failed to fetch requests:", error);
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch pending donation requests using the hook
+  const { data, isLoading: loading, isError, error } = useGetPendingDonations({ 
+    page: currentPage, 
+    limit: 12 
+  });
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
+  const requests = data?.requests || [];
+  const totalPages = data?.totalPages || 1;
+  const total = data?.total || 0;
 
   // Handle page change
   const handlePageChange = (page) => {
-    fetchRequests(page);
+    setCurrentPage(page);
   };
 
   // Format date and time

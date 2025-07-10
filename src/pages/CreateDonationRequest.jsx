@@ -15,12 +15,13 @@ import { useAuth } from "../contexts/AuthContext";
 
 function CreateDonationRequest() {
   const { user } = useAuth();
-  const donationAPI = useDonationAPI();
+  const { useCreateRequest } = useDonationAPI();
+  const { mutate: createRequestMutation, isPending: isMutationPending } = useCreateRequest();
   const navigate = useNavigate();
   
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = isMutationPending;
 
   const {
     register,
@@ -51,40 +52,38 @@ function CreateDonationRequest() {
   };
 
   // Handle form submission
-  const onSubmit = async (data) => {
-    try {
-      setIsSubmitting(true);
+  const onSubmit = (data) => {
+    // Use the new utility function to convert IDs to names
+    const { districtName, upazilaName } = convertLocationIdsToNames(
+      data.recipientDistrict, 
+      data.recipientUpazila
+    );
 
-      // Use the new utility function to convert IDs to names
-      const { districtName, upazilaName } = convertLocationIdsToNames(
-        data.recipientDistrict, 
-        data.recipientUpazila
-      );
+    const requestData = {
+      requesterName: data.requesterName,
+      requesterEmail: data.requesterEmail,
+      recipientName: data.recipientName,
+      recipientDistrict: districtName,
+      recipientUpazila: upazilaName,
+      hospitalName: data.hospitalName,
+      fullAddress: data.fullAddress,
+      bloodGroup: data.bloodGroup,
+      donationDate: data.donationDate,
+      donationTime: data.donationTime,
+      requestMessage: data.requestMessage,
+      donationStatus: "pending" // Default status
+    };
 
-      const requestData = {
-        requesterName: data.requesterName,
-        requesterEmail: data.requesterEmail,
-        recipientName: data.recipientName,
-        recipientDistrict: districtName,
-        recipientUpazila: upazilaName,
-        hospitalName: data.hospitalName,
-        fullAddress: data.fullAddress,
-        bloodGroup: data.bloodGroup,
-        donationDate: data.donationDate,
-        donationTime: data.donationTime,
-        requestMessage: data.requestMessage,
-        donationStatus: "pending" // Default status
-      };
-
-      await donationAPI.createRequest(requestData);
-      toast.success("Donation request created successfully!");
-      navigate("/dashboard/my-donation-requests");
-    } catch (error) {
-      console.error("Error creating donation request:", error);
-      toast.error(error.response?.data?.message || "Failed to create donation request");
-    } finally {
-      setIsSubmitting(false);
-    }
+    createRequestMutation(requestData, {
+      onSuccess: () => {
+        toast.success("Donation request created successfully!");
+        navigate("/dashboard/my-donation-requests");
+      },
+      onError: (error) => {
+        console.error("Error creating donation request:", error);
+        toast.error(error.response?.data?.message || "Failed to create donation request");
+      }
+    });
   };
 
   // Check if user is blocked
