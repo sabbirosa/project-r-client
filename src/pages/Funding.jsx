@@ -1,11 +1,218 @@
+import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaDonate, FaMoneyBillWave, FaPlus } from "react-icons/fa";
+import { FaCalendar, FaCreditCard, FaDonate, FaMoneyBillWave, FaPlus, FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
 import useFundingAPI from "../api/useFundingAPI";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Modal, Pagination, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
+
+// Initialize Stripe with error handling
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
+
+// Payment Form Component
+function PaymentForm({ amount, onSuccess, onCancel }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const fundingAPI = useFundingAPI();
+  const { user } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cardError, setCardError] = useState(null);
+
+  // Check if Stripe is properly loaded
+  if (!stripePublishableKey) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <FaCreditCard className="h-5 w-5 text-red-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Payment Configuration Error
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>
+                  Stripe is not configured. Please add your Stripe publishable key to the environment variables.
+                </p>
+                <p className="mt-1">
+                  Add <code className="bg-red-100 px-1 rounded">VITE_STRIPE_PUBLISHABLE_KEY</code> to your .env file.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex space-x-4 justify-end">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      toast.error('Stripe has not loaded yet. Please try again.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setCardError(null);
+
+    try {
+      const cardElement = elements.getElement(CardElement);
+
+      if (!cardElement) {
+        throw new Error('Card element not found');
+      }
+
+      // Create payment method
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name: user?.name,
+          email: user?.email,
+        },
+      });
+
+      if (error) {
+        setCardError(error.message);
+        toast.error(error.message);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Process payment through your API
+      const fundingData = {
+        amount: parseFloat(amount),
+        paymentMethodId: paymentMethod.id,
+        donorName: user?.name,
+        donorEmail: user?.email,
+      };
+
+      await fundingAPI.createFunding(fundingData);
+      
+      toast.success('Thank you for your donation!');
+      onSuccess();
+    } catch (error) {
+      console.error('Payment error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Payment failed. Please try again.';
+      setCardError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCardChange = (event) => {
+    if (event.error) {
+      setCardError(event.error.message);
+    } else {
+      setCardError(null);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Donation Amount
+        </label>
+        <div className="text-2xl font-bold text-green-600 mb-4">
+          ${parseFloat(amount).toFixed(2)}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Card Information
+        </label>
+        <div className="border border-gray-300 rounded-md p-4 bg-white">
+          <CardElement
+            onChange={handleCardChange}
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#374151',
+                  fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
+                  '::placeholder': {
+                    color: '#9CA3AF',
+                  },
+                  iconColor: '#6B7280',
+                },
+                invalid: {
+                  color: '#EF4444',
+                  iconColor: '#EF4444',
+                },
+              },
+              hidePostalCode: false,
+            }}
+          />
+        </div>
+        {cardError && (
+          <p className="mt-2 text-sm text-red-600 flex items-center">
+            <FaCreditCard className="h-4 w-4 mr-1" />
+            {cardError}
+          </p>
+        )}
+      </div>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <FaCreditCard className="h-5 w-5 text-blue-400" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-blue-800">
+              Test Mode
+            </h3>
+            <div className="mt-2 text-sm text-blue-700">
+              <p>Use test card: 4242 4242 4242 4242</p>
+              <p>Any future date, any CVC, any postal code</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex space-x-4 justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isProcessing}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={!stripe || isProcessing || !!cardError}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          {isProcessing ? (
+            <div className="flex items-center space-x-2">
+              <LoadingSpinner size="sm" />
+              <span>Processing...</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <FaDonate />
+              <span>Donate ${parseFloat(amount).toFixed(2)}</span>
+            </div>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
 
 function Funding() {
   const { user } = useAuth();
@@ -14,7 +221,7 @@ function Funding() {
   // State for pagination and modals
   const [currentPage, setCurrentPage] = useState(1);
   const [showDonateModal, setShowDonateModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [donationAmount, setDonationAmount] = useState('');
   
   const itemsPerPage = 10;
 
@@ -30,7 +237,7 @@ function Funding() {
       page: currentPage,
       limit: itemsPerPage
     }),
-    enabled: !!user && (user.role === 'admin' || user.role === 'volunteer')
+    enabled: !!user
   });
 
   // Fetch funding statistics
@@ -40,54 +247,48 @@ function Funding() {
   } = useQuery({
     queryKey: ['fundingStats'],
     queryFn: () => fundingAPI.getFundingStats(),
-    enabled: !!user && (user.role === 'admin' || user.role === 'volunteer')
+    enabled: !!user
   });
 
-  // Form for donation
+  // Form for donation amount
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    watch,
+    setValue
   } = useForm();
 
-  // Handle donation submission
-  const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    try {
-      await fundingAPI.createFunding({
-        amount: parseFloat(data.amount),
-        paymentMethod: 'stripe',
-        transactionId: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      });
+  const watchedAmount = watch('amount');
 
-      toast.success('Thank you for your donation!');
-      setShowDonateModal(false);
-      reset();
-      refetch();
-      
-      // If stats are visible, refetch them too
-      if (user.role === 'admin' || user.role === 'volunteer') {
-        // TanStack Query will automatically refetch stats due to cache invalidation
-      }
-    } catch (error) {
-      console.error('Error creating funding:', error);
-      toast.error(error.response?.data?.message || 'Failed to process donation');
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Handle donation modal submission
+  const onDonationSubmit = (data) => {
+    setDonationAmount(data.amount);
+    // Don't close modal yet - payment form will handle success
   };
 
-  if (statsLoading && (user.role === 'admin' || user.role === 'volunteer')) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner size="lg" text="Loading funding data..." />
-      </div>
-    );
-  }
+  // Handle successful payment
+  const handlePaymentSuccess = () => {
+    setShowDonateModal(false);
+    reset();
+    setDonationAmount('');
+    refetch(); // Refresh funding records
+  };
 
-  const fundingRecords = fundingData?.funding || [];
-  const totalPages = fundingData?.totalPages || 1;
+  // Handle payment cancellation
+  const handlePaymentCancel = () => {
+    setDonationAmount('');
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -101,247 +302,262 @@ function Funding() {
             </CardTitle>
             <Button 
               onClick={() => setShowDonateModal(true)}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
             >
               <FaPlus className="h-4 w-4" />
               <span>Give Fund</span>
             </Button>
           </div>
         </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">
+            Support our blood donation organization by making a financial contribution. 
+            Your donations help us maintain our platform and support life-saving activities.
+          </p>
+        </CardContent>
       </Card>
 
-      {/* Statistics Cards (Admin/Volunteer only) */}
-      {(user?.role === 'admin' || user?.role === 'volunteer') && fundingStats && (
+      {/* Statistics Cards */}
+      {fundingStats && !statsLoading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
+          {/* Total Funding */}
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Funding</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    ${fundingStats.stats?.totalAmount?.toLocaleString() || '0'}
+                  <p className="text-green-600 text-sm font-medium mb-1">Total Funding</p>
+                  <p className="text-3xl font-bold text-green-900">
+                    ${fundingStats.totalAmount?.toFixed(2) || '0.00'}
                   </p>
+                  <p className="text-green-700 text-sm">All Time</p>
                 </div>
-                <FaMoneyBillWave className="h-8 w-8 text-green-500" />
+                <div className="bg-green-500 p-3 rounded-full">
+                  <FaMoneyBillWave className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card>
+
+          {/* Total Donors */}
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Donors</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {fundingStats.stats?.totalRecords || 0}
+                  <p className="text-blue-600 text-sm font-medium mb-1">Total Donors</p>
+                  <p className="text-3xl font-bold text-blue-900">
+                    {fundingStats.totalDonors || 0}
                   </p>
+                  <p className="text-blue-700 text-sm">Contributors</p>
                 </div>
-                <FaDonate className="h-8 w-8 text-blue-500" />
+                <div className="bg-blue-500 p-3 rounded-full">
+                  <FaUser className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
-          
-          <Card>
+
+          {/* Average Donation */}
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Average Donation</p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    ${fundingStats.stats?.totalRecords > 0 
-                      ? (fundingStats.stats.totalAmount / fundingStats.stats.totalRecords).toFixed(2)
-                      : '0'
-                    }
+                  <p className="text-purple-600 text-sm font-medium mb-1">Average Donation</p>
+                  <p className="text-3xl font-bold text-purple-900">
+                    ${fundingStats.averageAmount?.toFixed(2) || '0.00'}
                   </p>
+                  <p className="text-purple-700 text-sm">Per Donor</p>
                 </div>
-                <FaMoneyBillWave className="h-8 w-8 text-purple-500" />
+                <div className="bg-purple-500 p-3 rounded-full">
+                  <FaDonate className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Funding Records Table (Admin/Volunteer only) */}
-      {(user?.role === 'admin' || user?.role === 'volunteer') && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              Funding Records
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center items-center h-32">
-                <LoadingSpinner size="lg" text="Loading funding records..." />
-              </div>
-            ) : error ? (
-              <div className="text-center text-red-600 py-8">
-                <p>Error loading funding records: {error.message}</p>
-                <Button onClick={() => refetch()} className="mt-4">
-                  Try Again
-                </Button>
-              </div>
-            ) : fundingRecords.length === 0 ? (
-              <div className="text-center py-12">
-                <FaMoneyBillWave className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">No funding records found.</p>
-                <p className="text-gray-400">Encourage users to make their first donation!</p>
-              </div>
-            ) : (
-              <>
+      {/* Funding Records Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-gray-900">
+            Funding Records
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <LoadingSpinner size="lg" text="Loading funding records..." />
+            </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-red-600 mb-4">Failed to load funding records</p>
+              <Button onClick={() => refetch()}>Try Again</Button>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Donor Name</TableHead>
                       <TableHead>Amount</TableHead>
-                      <TableHead>Payment Method</TableHead>
-                      <TableHead>Transaction ID</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Funding Date</TableHead>
+                      <TableHead>Payment Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {fundingRecords.map((record) => (
-                      <TableRow key={record._id}>
-                        <TableCell className="font-medium">
-                          {record.userName}
-                        </TableCell>
-                        <TableCell className="text-green-600 font-semibold">
-                          ${record.amount.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">
-                            {record.paymentMethod}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">
-                          {record.transactionId}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(record.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={record.status === 'completed' ? 'success' : 'warning'}
-                          >
-                            {record.status}
-                          </Badge>
+                    {fundingData?.records?.length > 0 ? (
+                      fundingData.records.map((funding) => (
+                        <TableRow key={funding._id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center space-x-2">
+                              <FaUser className="text-gray-400" />
+                              <span>{funding.donorName}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-1">
+                              <FaMoneyBillWave className="text-green-500" />
+                              <span className="font-semibold text-green-600">
+                                ${funding.amount.toFixed(2)}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <FaCalendar className="text-gray-400" />
+                              <span>{formatDate(funding.createdAt)}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              className={
+                                funding.paymentStatus === 'completed' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : funding.paymentStatus === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                              }
+                            >
+                              {funding.paymentStatus || 'completed'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                          No funding records found
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
+              </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center mt-6">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Information for Regular Users */}
-      {user?.role === 'donor' && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <FaDonate className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Support Our Blood Donation Organization
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Your financial support helps us maintain our platform, organize blood drives, 
-              and connect donors with those in need. Every contribution makes a difference.
-            </p>
-            <Button 
-              onClick={() => setShowDonateModal(true)}
-              size="lg"
-              className="flex items-center space-x-2 mx-auto"
-            >
-              <FaDonate className="h-5 w-5" />
-              <span>Make a Donation</span>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+              {/* Pagination */}
+              {fundingData?.totalPages > 1 && (
+                <div className="mt-6 flex justify-center">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={fundingData.totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Donation Modal */}
       <Modal
         isOpen={showDonateModal}
-        onClose={() => setShowDonateModal(false)}
+        onClose={() => {
+          setShowDonateModal(false);
+          reset();
+          setDonationAmount('');
+        }}
         title="Make a Donation"
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-              Donation Amount (USD) *
-            </label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.01"
-              min="1"
-              placeholder="Enter amount"
-              {...register("amount", {
-                required: "Donation amount is required",
-                min: {
-                  value: 1,
-                  message: "Minimum donation amount is $1"
-                },
-                max: {
-                  value: 10000,
-                  message: "Maximum donation amount is $10,000"
-                }
-              })}
-              className={errors.amount ? "border-red-500" : ""}
-            />
-            {errors.amount && (
-              <p className="text-red-500 text-sm mt-1">{errors.amount.message}</p>
-            )}
-          </div>
+        <div className="space-y-6">
+          {!donationAmount ? (
+            // Amount selection form
+            <form onSubmit={handleSubmit(onDonationSubmit)} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Donation Amount ($)
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  placeholder="Enter amount (e.g., 25.00)"
+                  {...register('amount', {
+                    required: 'Amount is required',
+                    min: { value: 1, message: 'Minimum donation is $1' },
+                    max: { value: 10000, message: 'Maximum donation is $10,000' }
+                  })}
+                />
+                {errors.amount && (
+                  <p className="mt-1 text-sm text-red-600">{errors.amount.message}</p>
+                )}
+              </div>
 
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">Payment Information</h4>
-            <p className="text-sm text-blue-700">
-              For demo purposes, this will simulate a successful payment. 
-              In a real application, this would integrate with Stripe or another payment processor.
-            </p>
-          </div>
+              {/* Quick amount buttons */}
+              <div className="grid grid-cols-4 gap-2">
+                {[10, 25, 50, 100].map((amount) => (
+                  <Button
+                    key={amount}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setValue('amount', amount)}
+                  >
+                    ${amount}
+                  </Button>
+                ))}
+              </div>
 
-          <div className="flex justify-end space-x-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowDonateModal(false)}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex items-center space-x-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <LoadingSpinner size="sm" />
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <FaDonate className="h-4 w-4" />
-                  <span>Donate Now</span>
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
+              <div className="flex space-x-4 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowDonateModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                  Continue to Payment
+                </Button>
+              </div>
+            </form>
+          ) : (
+            // Stripe payment form
+            stripePromise ? (
+              <Elements stripe={stripePromise}>
+                <PaymentForm
+                  amount={donationAmount}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
+                />
+              </Elements>
+            ) : (
+              <div className="text-center py-8">
+                <FaCreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Payment Not Available
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Payment processing is not configured. Please contact support.
+                </p>
+                <Button onClick={() => setShowDonateModal(false)}>
+                  Close
+                </Button>
+              </div>
+            )
+          )}
+        </div>
       </Modal>
     </div>
   );
