@@ -4,6 +4,8 @@ import RootLayout from "../layouts/RootLayout";
 import AddBlog from "../pages/AddBlog";
 import AllBloodDonationRequests from "../pages/AllBloodDonationRequests";
 import AllUsers from "../pages/AllUsers";
+import Blog from "../pages/Blog";
+import BlogDetails from "../pages/BlogDetails";
 import BloodDonationRequests from "../pages/BloodDonationRequests";
 import ContentManagement from "../pages/ContentManagement";
 import CreateDonationRequest from "../pages/CreateDonationRequest";
@@ -147,11 +149,11 @@ const router = createBrowserRouter([
   },
   {
     path: "blog",
-    element: <div>Blog</div>, // TODO: Create this component
+    element: <Blog />,
   },
   {
     path: "blog/:id",
-    element: <div>Blog Post</div>, // TODO: Create this component
+    element: <BlogDetails />,
   },
   
   // 404 Route
