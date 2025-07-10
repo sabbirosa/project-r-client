@@ -213,7 +213,7 @@ function Register() {
                 onChange={handleDistrictChange}
               >
                 {districts.map((district) => (
-                  <option key={district.id} value={district.id}>
+                  <option key={district.id} value={district.name}>
                     {district.name}
                   </option>
                 ))}
@@ -229,7 +229,7 @@ function Register() {
                 {...register("upazila", { required: "Upazila is required" })}
               >
                 {filteredUpazilas.map((upazila) => (
-                  <option key={upazila.id} value={upazila.id}>
+                  <option key={upazila.id} value={upazila.name}>
                     {upazila.name}
                   </option>
                 ))}
