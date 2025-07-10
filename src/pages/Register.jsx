@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
-import { districts, upazilas } from "../constants/bdLocations";
+import { districts, getUpazilasbyDistrictId } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -39,12 +39,9 @@ function Register() {
     setValue("district", districtId);
     setValue("upazila", ""); // Reset upazila when district changes
     
-    if (districtId) {
-      const filtered = upazilas.filter((upazila) => upazila.district_id === districtId);
-      setFilteredUpazilas(filtered);
-    } else {
-      setFilteredUpazilas([]);
-    }
+    // Use the new utility function for filtering upazilas
+    const filtered = getUpazilasbyDistrictId(districtId);
+    setFilteredUpazilas(filtered);
   };
 
   // Handle avatar file selection

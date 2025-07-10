@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaMapMarkerAlt, FaSearch, FaTint, FaUser } from "react-icons/fa";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, LoadingSpinner, Select } from "../components/ui";
-import { districts, upazilas } from "../constants/bdLocations";
+import { districts, getUpazilasbyDistrictName } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 
 function SearchDonors() {
@@ -28,13 +28,9 @@ function SearchDonors() {
 
     // Update upazilas when district changes
     if (name === "district") {
-      const selectedDistrict = districts.find(d => d.name === value);
-      if (selectedDistrict) {
-        const districtUpazilas = upazilas.filter(u => u.district_id === selectedDistrict.id);
-        setFilteredUpazilas(districtUpazilas);
-      } else {
-        setFilteredUpazilas([]);
-      }
+      // Use the new utility function for filtering upazilas
+      const districtUpazilas = getUpazilasbyDistrictName(value);
+      setFilteredUpazilas(districtUpazilas);
       setSearchForm(prev => ({ ...prev, upazila: "" })); // Reset upazila
     }
   };

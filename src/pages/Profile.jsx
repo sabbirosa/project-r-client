@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import useAuthAPI from "../api/useAuthAPI";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
-import { districts, upazilas } from "../constants/bdLocations";
+import { districts, getUpazilasbyDistrictId } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -62,9 +62,9 @@ function Profile() {
       setSelectedDistrict(profileData.district || "");
       setAvatarPreview(profileData.avatar || null);
       
-      // Filter upazilas based on district
+      // Filter upazilas based on district using new utility function
       if (profileData.district) {
-        const filtered = upazilas.filter((upazila) => upazila.district_id === profileData.district);
+        const filtered = getUpazilasbyDistrictId(profileData.district);
         setFilteredUpazilas(filtered);
       }
     }
@@ -75,12 +75,9 @@ function Profile() {
       setSelectedDistrict(watchedDistrict);
       setValue("upazila", ""); // Reset upazila when district changes
       
-      if (watchedDistrict) {
-        const filtered = upazilas.filter((upazila) => upazila.district_id === watchedDistrict);
-        setFilteredUpazilas(filtered);
-      } else {
-        setFilteredUpazilas([]);
-      }
+      // Use the new utility function for filtering upazilas
+      const filtered = getUpazilasbyDistrictId(watchedDistrict);
+      setFilteredUpazilas(filtered);
     }
   }, [watchedDistrict, selectedDistrict, setValue]);
 

@@ -6,7 +6,12 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import useDonationAPI from "../api/useDonationAPI";
 import { Alert, AlertDescription, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Select, Textarea } from "../components/ui";
-import { districts, upazilas } from "../constants/bdLocations";
+import {
+  convertLocationIdsToNames,
+  convertLocationNamesToIds,
+  districts,
+  getUpazilasbyDistrictId
+} from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -48,17 +53,19 @@ function EditDonationRequest() {
     if (requestData) {
       const request = requestData.request || requestData;
       
-      // Find district and upazila IDs
-      const district = districts.find(d => d.name === request.recipientDistrict);
-      const upazila = upazilas.find(u => u.name === request.recipientUpazila);
+      // Use utility function to convert names to IDs
+      const { districtId, upazilaId } = convertLocationNamesToIds(
+        request.recipientDistrict,
+        request.recipientUpazila
+      );
       
       // Set form values
       reset({
         requesterName: request.requesterName,
         requesterEmail: request.requesterEmail,
         recipientName: request.recipientName,
-        recipientDistrict: district?.id || "",
-        recipientUpazila: upazila?.id || "",
+        recipientDistrict: districtId,
+        recipientUpazila: upazilaId,
         hospitalName: request.hospitalName,
         fullAddress: request.fullAddress,
         bloodGroup: request.bloodGroup,
@@ -67,10 +74,10 @@ function EditDonationRequest() {
         requestMessage: request.requestMessage,
       });
 
-      // Set district and filter upazilas
-      if (district) {
-        setSelectedDistrict(district.id);
-        const filtered = upazilas.filter((upazila) => upazila.district_id === district.id);
+      // Set district and filter upazilas using utility function
+      if (districtId) {
+        setSelectedDistrict(districtId);
+        const filtered = getUpazilasbyDistrictId(districtId);
         setFilteredUpazilas(filtered);
       }
     }
@@ -83,12 +90,9 @@ function EditDonationRequest() {
     setValue("recipientDistrict", districtId);
     setValue("recipientUpazila", ""); // Reset upazila when district changes
     
-    if (districtId) {
-      const filtered = upazilas.filter((upazila) => upazila.district_id === districtId);
-      setFilteredUpazilas(filtered);
-    } else {
-      setFilteredUpazilas([]);
-    }
+    // Use the new utility function for filtering upazilas
+    const filtered = getUpazilasbyDistrictId(districtId);
+    setFilteredUpazilas(filtered);
   };
 
   // Handle form submission
@@ -96,16 +100,18 @@ function EditDonationRequest() {
     try {
       setIsSubmitting(true);
 
-      // Get district and upazila names
-      const district = districts.find(d => d.id === data.recipientDistrict);
-      const upazila = upazilas.find(u => u.id === data.recipientUpazila);
+      // Use the new utility function to convert IDs to names
+      const { districtName, upazilaName } = convertLocationIdsToNames(
+        data.recipientDistrict,
+        data.recipientUpazila
+      );
 
       const requestData = {
         requesterName: data.requesterName,
         requesterEmail: data.requesterEmail,
         recipientName: data.recipientName,
-        recipientDistrict: district?.name || data.recipientDistrict,
-        recipientUpazila: upazila?.name || data.recipientUpazila,
+        recipientDistrict: districtName,
+        recipientUpazila: upazilaName,
         hospitalName: data.hospitalName,
         fullAddress: data.fullAddress,
         bloodGroup: data.bloodGroup,
