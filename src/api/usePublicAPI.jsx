@@ -17,19 +17,19 @@ function usePublicAPI() {
 
   // Get all pending donation requests (public view)
   const getPendingDonations = async (params = {}) => {
-    const response = await axiosSecure.get("/public/donations", { params });
+    const response = await axiosSecure.get("/public/donation-requests", { params });
     return response.data;
   };
 
   // Get donation request details (public view)
   const getDonationDetails = async (id) => {
-    const response = await axiosSecure.get(`/public/donations/${id}`);
+    const response = await axiosSecure.get(`/public/donation-requests/${id}`);
     return response.data;
   };
 
   // Search donors by blood group and location
   const searchDonors = async (searchParams) => {
-    const response = await axiosSecure.get("/public/donors/search", { params: searchParams });
+    const response = await axiosSecure.get("/public/search-donors", { params: searchParams });
     return response.data;
   };
 

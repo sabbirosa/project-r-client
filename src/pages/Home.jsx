@@ -1,10 +1,50 @@
+import { useState } from "react";
 import { FaEnvelope, FaHandHoldingHeart, FaMapMarkerAlt, FaPhone, FaSearch, FaTint, FaUserPlus, FaUsers } from "react-icons/fa";
 import { Link } from "react-router";
+import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, Input, Textarea } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 
 function Home() {
   const { isAuthenticated } = useAuth();
+  const { submitContactForm } = usePublicAPI();
+  
+  // Contact form state
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [submitError, setSubmitError] = useState("");
+
+  // Handle contact form input changes
+  const handleContactChange = (e) => {
+    const { name, value } = e.target;
+    setContactForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle contact form submission
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage("");
+    setSubmitError("");
+
+    try {
+      const result = await submitContactForm(contactForm);
+      setSubmitMessage(result.message);
+      setContactForm({ name: "", email: "", message: "" }); // Reset form
+    } catch (error) {
+      setSubmitError(error.message || "Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -227,27 +267,47 @@ function Home() {
             <Card>
               <CardContent className="p-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">Send us a message</h3>
-                <form className="space-y-6">
+                <form onSubmit={handleContactSubmit} className="space-y-6">
                   <Input
                     label="Your Name"
                     placeholder="Enter your name"
+                    name="name"
+                    value={contactForm.name}
+                    onChange={handleContactChange}
+                    required
                   />
                   
                   <Input
                     label="Email Address"
                     type="email"
                     placeholder="Enter your email"
+                    name="email"
+                    value={contactForm.email}
+                    onChange={handleContactChange}
+                    required
                   />
                   
                   <Textarea
                     label="Message"
                     rows={4}
                     placeholder="Enter your message"
+                    name="message"
+                    value={contactForm.message}
+                    onChange={handleContactChange}
+                    required
                   />
                   
-                  <Button type="submit" className="w-full">
-                    Send Message
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
+                  {submitMessage && (
+                    <p className={`text-center ${submitError ? 'text-red-600' : 'text-green-600'}`}>
+                      {submitMessage}
+                    </p>
+                  )}
+                  {submitError && (
+                    <p className="text-center text-red-600">{submitError}</p>
+                  )}
                 </form>
               </CardContent>
             </Card>

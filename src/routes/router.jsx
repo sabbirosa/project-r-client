@@ -128,17 +128,17 @@ const router = createBrowserRouter([
   // Public routes outside of main layout
   {
     path: "search",
-    element: <div>Search Donors</div>, // TODO: Create this component
+    element: <SearchDonors />,
   },
   {
     path: "donation-requests",
-    element: <div>Blood Donation Requests</div>, // TODO: Create this component
+    element: <BloodDonationRequests />,
   },
   {
     path: "donation-requests/:id",
     element: (
       <PrivateRoute>
-        <div>Donation Request Details</div> {/* TODO: Create this component */}
+        <DonationRequestDetails />
       </PrivateRoute>
     ),
   },
