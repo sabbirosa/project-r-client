@@ -2,8 +2,8 @@ import { useState } from "react";
 import { FaMapMarkerAlt, FaSearch, FaTint, FaUser } from "react-icons/fa";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, LoadingSpinner, Select } from "../components/ui";
-import { DISTRICTS } from "../constants/bdLocations";
-import { BLOOD_GROUPS } from "../constants/bloodGroups";
+import { districts, upazilas } from "../constants/bdLocations";
+import { bloodGroups } from "../constants/bloodGroups";
 
 function SearchDonors() {
   const { searchDonors } = usePublicAPI();
@@ -16,7 +16,7 @@ function SearchDonors() {
   const [donors, setDonors] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [upazilas, setUpazilas] = useState([]);
+  const [filteredUpazilas, setFilteredUpazilas] = useState([]);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -28,8 +28,13 @@ function SearchDonors() {
 
     // Update upazilas when district changes
     if (name === "district") {
-      const selectedDistrict = DISTRICTS.find(d => d.name === value);
-      setUpazilas(selectedDistrict ? selectedDistrict.upazilas : []);
+      const selectedDistrict = districts.find(d => d.name === value);
+      if (selectedDistrict) {
+        const districtUpazilas = upazilas.filter(u => u.district_id === selectedDistrict.id);
+        setFilteredUpazilas(districtUpazilas);
+      } else {
+        setFilteredUpazilas([]);
+      }
       setSearchForm(prev => ({ ...prev, upazila: "" })); // Reset upazila
     }
   };
@@ -82,8 +87,8 @@ function SearchDonors() {
                     required
                   >
                     <option value="">Select Blood Group</option>
-                    {BLOOD_GROUPS.map(group => (
-                      <option key={group} value={group}>{group}</option>
+                    {bloodGroups.map(group => (
+                      <option key={group.value} value={group.value}>{group.label}</option>
                     ))}
                   </Select>
                 </div>
@@ -100,7 +105,7 @@ function SearchDonors() {
                     required
                   >
                     <option value="">Select District</option>
-                    {DISTRICTS.map(district => (
+                    {districts.map(district => (
                       <option key={district.name} value={district.name}>
                         {district.name}
                       </option>
@@ -121,8 +126,8 @@ function SearchDonors() {
                     required
                   >
                     <option value="">Select Upazila</option>
-                    {upazilas.map(upazila => (
-                      <option key={upazila} value={upazila}>{upazila}</option>
+                    {filteredUpazilas.map(upazila => (
+                      <option key={upazila.id} value={upazila.name}>{upazila.name}</option>
                     ))}
                   </Select>
                 </div>

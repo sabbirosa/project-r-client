@@ -300,14 +300,14 @@ function Home() {
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
-                  {submitMessage && (
-                    <p className={`text-center ${submitError ? 'text-red-600' : 'text-green-600'}`}>
-                      {submitMessage}
-                    </p>
-                  )}
-                  {submitError && (
-                    <p className="text-center text-red-600">{submitError}</p>
-                  )}
+                                     {submitMessage && (
+                     <p className="text-center text-green-600">
+                       {submitMessage}
+                     </p>
+                   )}
+                   {submitError && (
+                     <p className="text-center text-red-600">{submitError}</p>
+                   )}
                 </form>
               </CardContent>
             </Card>
