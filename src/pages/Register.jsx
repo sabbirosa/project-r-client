@@ -4,7 +4,7 @@ import { FaEye, FaEyeSlash, FaUpload, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, Select } from "../components/ui";
 import { districts, getUpazilasbyDistrictName } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
@@ -70,8 +70,8 @@ function Register() {
       console.error("Error uploading avatar:", error);
       
       // Handle specific error messages
-      if (error.message.includes('API key not configured')) {
-        toast.error('Please configure ImageBB API key in your .env file');
+      if (error.message.includes('cloud name not configured') || error.message.includes('upload preset not configured')) {
+        toast.error('Please configure Cloudinary settings in your .env file');
       } else if (error.message.includes('file type')) {
         toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
       } else if (error.message.includes('size')) {
@@ -118,6 +118,7 @@ function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+
         <div>
           <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-red-100">
             <FaUser className="h-6 w-6 text-red-600" />
@@ -141,9 +142,12 @@ function Register() {
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
                     {avatarPreview ? (
-                      <img
+                      <CloudinaryImage
                         src={avatarPreview}
                         alt="Avatar preview"
+                        width={96}
+                        height={96}
+                        crop="fill"
                         className="w-full h-full object-cover"
                       />
                     ) : (

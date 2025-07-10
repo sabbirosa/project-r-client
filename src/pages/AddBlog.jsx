@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useAdminAPI from "../api/useAdminAPI";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner } from "../components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, LoadingSpinner } from "../components/ui";
 
 function AddBlog() {
   const navigate = useNavigate();
@@ -88,8 +88,8 @@ function AddBlog() {
       console.error('Error uploading image:', error);
       
       // Handle specific error messages
-      if (error.message.includes('API key not configured')) {
-        toast.error('Please configure ImageBB API key in your .env file');
+      if (error.message.includes('cloud name not configured') || error.message.includes('upload preset not configured')) {
+        toast.error('Please configure Cloudinary settings in your .env file');
       } else if (error.message.includes('file type')) {
         toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
       } else if (error.message.includes('size')) {
@@ -221,9 +221,12 @@ function AddBlog() {
                 {/* Image Preview */}
                 {(thumbnailPreview || thumbnailUrl) && (
                   <div className="relative">
-                    <img
+                    <CloudinaryImage
                       src={thumbnailPreview || thumbnailUrl}
                       alt="Thumbnail preview"
+                      width={400}
+                      height={192}
+                      crop="fill"
                       className="w-full max-w-md h-48 object-cover rounded-lg border"
                       onError={() => {
                         setThumbnailPreview("");

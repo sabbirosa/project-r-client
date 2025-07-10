@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import useAdminAPI from "../api/useAdminAPI";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner } from "../components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, LoadingSpinner } from "../components/ui";
 
 function EditBlog() {
   const { id } = useParams();
@@ -83,7 +83,7 @@ function EditBlog() {
     }
   }, [thumbnailUrl, thumbnailPreview]);
 
-  // Handle image upload to ImageBB
+  // Handle image upload to Cloudinary
   const { useUploadImage } = usePublicAPI();
   const { mutateAsync: uploadImageMutation } = useUploadImage();
 
@@ -107,8 +107,8 @@ function EditBlog() {
       console.error('Error uploading image:', error);
       
       // Handle specific error messages
-      if (error.message.includes('API key not configured')) {
-        toast.error('Please configure ImageBB API key in your .env file');
+      if (error.message.includes('cloud name not configured') || error.message.includes('upload preset not configured')) {
+        toast.error('Please configure Cloudinary settings in your .env file');
       } else if (error.message.includes('file type')) {
         toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
       } else if (error.message.includes('size')) {
@@ -283,27 +283,21 @@ function EditBlog() {
                 </div>
 
                 {/* Image Preview */}
-                {thumbnailPreview && (
-                  <div className="relative inline-block">
-                    <img
-                      src={thumbnailPreview}
+                {(thumbnailPreview || thumbnailUrl) && (
+                  <div className="mt-4">
+                    <CloudinaryImage
+                      src={thumbnailPreview || thumbnailUrl}
                       alt="Thumbnail preview"
-                      className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
+                      width={400}
+                      height={240}
+                      crop="fill"
+                      className="w-full max-w-sm h-60 object-cover rounded-lg border"
+                      onError={(e) => {
+                        console.error("Image load error:", e);
+                        setThumbnailPreview("");
+                        setValue("thumbnail", "");
+                      }}
                     />
-                    <div className="absolute -top-2 -right-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          setValue("thumbnail", "");
-                          setThumbnailPreview("");
-                        }}
-                        className="h-6 w-6 rounded-full p-0"
-                      >
-                        ×
-                      </Button>
-                    </div>
                   </div>
                 )}
               </div>

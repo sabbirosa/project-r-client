@@ -5,7 +5,7 @@ import { FaCamera, FaEdit, FaSave, FaTimes, FaUpload } from "react-icons/fa";
 import { toast } from "react-toastify";
 import useAuthAPI from "../api/useAuthAPI";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, Select } from "../components/ui";
 import { districts, getUpazilaById, getUpazilasbyDistrictId } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
@@ -100,7 +100,7 @@ function Profile() {
     }
   };
 
-  // Upload avatar to ImageBB
+  // Upload avatar to Cloudinary
   const { useUploadImage } = usePublicAPI();
   const { mutateAsync: uploadImageMutation } = useUploadImage();
 
@@ -113,8 +113,8 @@ function Profile() {
       console.error("Error uploading image:", error);
       
       // Handle specific error messages
-      if (error.message.includes('API key not configured')) {
-        toast.error('Please configure ImageBB API key in your .env file');
+      if (error.message.includes('cloud name not configured') || error.message.includes('upload preset not configured')) {
+        toast.error('Please configure Cloudinary settings in your .env file');
       } else if (error.message.includes('file type')) {
         toast.error('Please select a valid image file (PNG, JPG, JPEG, GIF, etc.)');
       } else if (error.message.includes('size')) {
@@ -264,9 +264,12 @@ function Profile() {
               <div className="relative">
                 <div className="w-32 h-32 rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100">
                   {avatarPreview ? (
-                    <img
+                    <CloudinaryImage
                       src={avatarPreview}
                       alt="Profile"
+                      width={128}
+                      height={128}
+                      crop="fill"
                       className="w-full h-full object-cover"
                     />
                   ) : (
