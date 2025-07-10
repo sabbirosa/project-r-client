@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
-import { districts, getUpazilasbyDistrictId } from "../constants/bdLocations";
+import { districts, getUpazilasbyDistrictName } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -34,13 +34,13 @@ function Register() {
 
   // Handle district change and filter upazilas
   const handleDistrictChange = (e) => {
-    const districtId = e.target.value;
-    setSelectedDistrict(districtId);
-    setValue("district", districtId);
+    const districtName = e.target.value;
+    setSelectedDistrict(districtName);
+    setValue("district", districtName);
     setValue("upazila", ""); // Reset upazila when district changes
     
-    // Use the new utility function for filtering upazilas
-    const filtered = getUpazilasbyDistrictId(districtId);
+    // Use the correct utility function for filtering upazilas by district name
+    const filtered = getUpazilasbyDistrictName(districtName);
     setFilteredUpazilas(filtered);
   };
 
