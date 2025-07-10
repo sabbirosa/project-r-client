@@ -24,4 +24,77 @@ export const districts = districtsData
 // Extract upazilas from JSON data
 export const upazilas = upazilasData
   .find(item => item.type === "table" && item.name === "upazilas")
-  ?.data.sort((a, b) => a.name.localeCompare(b.name)) || []; 
+  ?.data.sort((a, b) => a.name.localeCompare(b.name)) || [];
+
+// ===== UTILITY FUNCTIONS =====
+
+export const getUpazilasbyDistrictId = (districtId) => {
+  if (!districtId) return [];
+  return upazilas.filter((upazila) => upazila.district_id === districtId);
+};
+
+export const getUpazilasbyDistrictName = (districtName) => {
+  if (!districtName) return [];
+  const district = districts.find(d => d.name === districtName);
+  if (!district) return [];
+  return upazilas.filter((upazila) => upazila.district_id === district.id);
+};
+
+export const getDistrictById = (districtId) => {
+  if (!districtId) return null;
+  return districts.find(d => d.id === districtId) || null;
+};
+
+export const getDistrictByName = (districtName) => {
+  if (!districtName) return null;
+  return districts.find(d => d.name === districtName) || null;
+};
+
+export const getUpazilaById = (upazilaId) => {
+  if (!upazilaId) return null;
+  return upazilas.find(u => u.id === upazilaId) || null;
+};
+
+export const getUpazilaByName = (upazilaName) => {
+  if (!upazilaName) return null;
+  return upazilas.find(u => u.name === upazilaName) || null;
+};
+
+export const getDivisionByDistrictId = (districtId) => {
+  if (!districtId) return null;
+  const district = getDistrictById(districtId);
+  if (!district) return null;
+  return divisions.find(div => div.id === district.division_id) || null;
+};
+
+export const getDivisionByDistrictName = (districtName) => {
+  if (!districtName) return null;
+  const district = getDistrictByName(districtName);
+  if (!district) return null;
+  return divisions.find(div => div.id === district.division_id) || null;
+};
+
+export const getDistrictsByDivisionId = (divisionId) => {
+  if (!divisionId) return [];
+  return districts.filter(d => d.division_id === divisionId);
+};
+
+export const convertLocationIdsToNames = (districtId, upazilaId) => {
+  const district = getDistrictById(districtId);
+  const upazila = getUpazilaById(upazilaId);
+  
+  return {
+    districtName: district?.name || districtId,
+    upazilaName: upazila?.name || upazilaId
+  };
+};
+
+export const convertLocationNamesToIds = (districtName, upazilaName) => {
+  const district = getDistrictByName(districtName);
+  const upazila = getUpazilaByName(upazilaName);
+  
+  return {
+    districtId: district?.id || "",
+    upazilaId: upazila?.id || ""
+  };
+}; 

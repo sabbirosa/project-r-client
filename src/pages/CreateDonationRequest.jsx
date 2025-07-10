@@ -5,7 +5,11 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useDonationAPI from "../api/useDonationAPI";
 import { Alert, AlertDescription, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Select, Textarea } from "../components/ui";
-import { districts, upazilas } from "../constants/bdLocations";
+import {
+    convertLocationIdsToNames,
+    districts,
+    getUpazilasbyDistrictId
+} from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -41,12 +45,9 @@ function CreateDonationRequest() {
     setValue("recipientDistrict", districtId);
     setValue("recipientUpazila", ""); // Reset upazila when district changes
     
-    if (districtId) {
-      const filtered = upazilas.filter((upazila) => upazila.district_id === districtId);
-      setFilteredUpazilas(filtered);
-    } else {
-      setFilteredUpazilas([]);
-    }
+    // Use the new utility function for filtering upazilas
+    const filtered = getUpazilasbyDistrictId(districtId);
+    setFilteredUpazilas(filtered);
   };
 
   // Handle form submission
@@ -54,16 +55,18 @@ function CreateDonationRequest() {
     try {
       setIsSubmitting(true);
 
-      // Get district and upazila names
-      const district = districts.find(d => d.id === data.recipientDistrict);
-      const upazila = upazilas.find(u => u.id === data.recipientUpazila);
+      // Use the new utility function to convert IDs to names
+      const { districtName, upazilaName } = convertLocationIdsToNames(
+        data.recipientDistrict, 
+        data.recipientUpazila
+      );
 
       const requestData = {
         requesterName: data.requesterName,
         requesterEmail: data.requesterEmail,
         recipientName: data.recipientName,
-        recipientDistrict: district?.name || data.recipientDistrict,
-        recipientUpazila: upazila?.name || data.recipientUpazila,
+        recipientDistrict: districtName,
+        recipientUpazila: upazilaName,
         hospitalName: data.hospitalName,
         fullAddress: data.fullAddress,
         bloodGroup: data.bloodGroup,
