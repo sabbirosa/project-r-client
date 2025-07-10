@@ -196,7 +196,7 @@ function DonationAnalytics() {
         <div className="flex flex-col sm:flex-row gap-3">
           <Select
             value={timeframe}
-            onValueChange={setTimeframe}
+            onChange={(e) => setTimeframe(e.target.value)}
             className="min-w-[120px]"
           >
             <option value="daily">Daily</option>
@@ -206,7 +206,7 @@ function DonationAnalytics() {
           
           <Select
             value={chartType}
-            onValueChange={setChartType}
+            onChange={(e) => setChartType(e.target.value)}
             className="min-w-[120px]"
           >
             <option value="area">Area Chart</option>

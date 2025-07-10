@@ -131,8 +131,8 @@ function AllBloodDonationRequests() {
             </div>
             <Select
               value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
             >

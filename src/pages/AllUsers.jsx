@@ -103,8 +103,8 @@ function AllUsers() {
             </div>
             <Select
               value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
             >
@@ -214,7 +214,8 @@ function AllUsers() {
                             {/* Role Selector */}
                             <Select
                               value={userData.role}
-                              onValueChange={(newRole) => {
+                              onChange={(e) => {
+                                const newRole = e.target.value;
                                 if (newRole !== userData.role) {
                                   handleRoleUpdate(userData._id, newRole);
                                 }
