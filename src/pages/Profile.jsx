@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import useAuthAPI from "../api/useAuthAPI";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "../components/ui";
-import { districts, getUpazilasbyDistrictId } from "../constants/bdLocations";
+import { districts, getUpazilaById, getUpazilasbyDistrictId } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -195,7 +195,7 @@ function Profile() {
   };
 
   const getUpazilaName = (upazilaId) => {
-    const upazila = upazilas.find(u => u.id === upazilaId);
+    const upazila = getUpazilaById(upazilaId);
     return upazila ? upazila.name : upazilaId;
   };
 
@@ -207,7 +207,7 @@ function Profile() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b border-gray-200-2 border-red-600"></div>
       </div>
     );
   }

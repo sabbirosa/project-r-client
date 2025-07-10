@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { cloneElement, forwardRef, isValidElement } from 'react';
 import { cn } from '../../utils/cn';
 
 const Button = forwardRef(({ 
@@ -7,6 +7,7 @@ const Button = forwardRef(({
   size = 'md', 
   loading = false,
   disabled = false,
+  asChild = false,
   children, 
   ...props 
 }, ref) => {
@@ -28,15 +29,36 @@ const Button = forwardRef(({
     xl: "px-8 py-4 text-lg",
   };
 
+  const combinedClassName = cn(
+    baseStyles,
+    variants[variant],
+    sizes[size],
+    loading && "cursor-wait",
+    className
+  );
+
+  // If asChild is true, render the children directly with the combined className
+  if (asChild) {
+    // Clone the first child and apply the button styles to it
+    if (isValidElement(children)) {
+      return cloneElement(children, {
+        className: cn(combinedClassName, children.props?.className),
+        ref,
+        ...props,
+        ...children.props,
+      });
+    }
+    // If no valid child element, render a span
+    return (
+      <span className={combinedClassName} ref={ref} {...props}>
+        {children}
+      </span>
+    );
+  }
+
   return (
     <button
-      className={cn(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        loading && "cursor-wait",
-        className
-      )}
+      className={combinedClassName}
       ref={ref}
       disabled={disabled || loading}
       {...props}

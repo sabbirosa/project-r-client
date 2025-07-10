@@ -38,13 +38,22 @@ function DonationRequestDetails() {
     }
   }, [id, getDonationDetails]);
 
+  // Check if current user is the requester
+  const isOwnRequest = user?._id === request?.requesterId;
+
   // Handle donation confirmation
   const handleConfirmDonation = async () => {
     setIsConfirming(true);
     setConfirmError("");
     
     try {
-      const result = await confirmDonation(id);
+      // Pass donor information to the API call
+      const donorInfo = {
+        donorName: user?.name,
+        donorEmail: user?.email
+      };
+      
+      const result = await confirmDonation(id, donorInfo);
       setConfirmMessage(result.message);
       setShowModal(false);
       // Refresh the request data to show updated status
@@ -235,7 +244,7 @@ function DonationRequestDetails() {
             <Card className="sticky top-8">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Help Save a Life
+                  {isOwnRequest ? "Your Request" : "Help Save a Life"}
                 </h3>
                 
                 <div className="space-y-4">
@@ -252,30 +261,67 @@ function DonationRequestDetails() {
                   </div>
 
                   <div className="text-center">
-                    <p className="text-sm text-gray-600 mb-4">
-                      Your donation can save up to 3 lives. Be a hero today!
-                    </p>
-                    
-                    <Button
-                      onClick={() => setShowModal(true)}
-                      size="lg"
-                      className="w-full"
-                    >
-                      <FaHandHoldingHeart className="w-4 h-4 mr-2" />
-                      I Want to Donate
-                    </Button>
+                    {isOwnRequest ? (
+                      <>
+                        <p className="text-sm text-gray-600 mb-4">
+                          This is your blood donation request. You cannot donate to your own request.
+                        </p>
+                        
+                        <Button
+                          size="lg"
+                          className="w-full"
+                          disabled
+                          variant="outline"
+                        >
+                          <FaHandHoldingHeart className="w-4 h-4 mr-2" />
+                          Cannot Donate to Own Request
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm text-gray-600 mb-4">
+                          Your donation can save up to 3 lives. Be a hero today!
+                        </p>
+                        
+                        <Button
+                          onClick={() => !isOwnRequest && request.donationStatus === "pending" && setShowModal(true)}
+                          size="lg"
+                          className="w-full"
+                          disabled={request.donationStatus !== "pending"}
+                        >
+                          <FaHandHoldingHeart className="w-4 h-4 mr-2" />
+                          {request.donationStatus === "pending" ? "I Want to Donate" : "Request Not Available"}
+                        </Button>
+                      </>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
                     <h4 className="font-medium text-gray-900 mb-2">
-                      What happens next?
+                      {isOwnRequest ? "Your request status" : "What happens next?"}
                     </h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• We'll notify the requester</li>
-                      <li>• You'll receive contact details</li>
-                      <li>• Coordinate the donation time</li>
-                      <li>• Help save a life!</li>
-                    </ul>
+                    {isOwnRequest ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          Status: <span className="font-medium capitalize">{request.donationStatus}</span>
+                        </p>
+                        {request.donorInfo && (
+                          <p className="text-sm text-gray-600">
+                            Donor: <span className="font-medium">{request.donorInfo.name}</span>
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-500">
+                          Share this request with potential donors to get help.
+                        </p>
+                      </div>
+                    ) : (
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• We'll notify the requester</li>
+                        <li>• You'll receive contact details</li>
+                        <li>• Coordinate the donation time</li>
+                        <li>• Help save a life!</li>
+                      </ul>
+                    )}
                   </div>
                 </div>
               </CardContent>

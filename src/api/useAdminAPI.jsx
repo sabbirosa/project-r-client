@@ -61,6 +61,22 @@ function useAdminAPI() {
     return response.data;
   };
 
+  // Analytics data
+  const getAnalyticsData = async (params = {}) => {
+    const response = await axiosSecure.get("/admin/analytics", { params });
+    return response.data;
+  };
+
+  const getBloodGroupDistribution = async () => {
+    const response = await axiosSecure.get("/admin/analytics/blood-groups");
+    return response.data;
+  };
+
+  const getTrendData = async (timeframe = 'daily') => {
+    const response = await axiosSecure.get(`/admin/analytics/trends?timeframe=${timeframe}`);
+    return response.data;
+  };
+
   // Funding management
   const getAllFunding = async (params = {}) => {
     const response = await axiosSecure.get("/admin/funding", { params });
@@ -103,6 +119,10 @@ function useAdminAPI() {
     updateBlogStatus,
     // Dashboard statistics
     getDashboardStats,
+    // Analytics
+    getAnalyticsData,
+    getBloodGroupDistribution,
+    getTrendData,
     // Funding management
     getAllFunding,
     getFundingStats,

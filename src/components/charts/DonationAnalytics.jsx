@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaCalendarAlt, FaChartArea, FaChartBar, FaChartLine } from "react-icons/fa";
 import {
     Area,
@@ -18,329 +19,426 @@ import {
     XAxis,
     YAxis
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle, Select } from "../ui";
+import useAdminAPI from "../../api/useAdminAPI";
+import useDonationAPI from "../../api/useDonationAPI";
+import useFundingAPI from "../../api/useFundingAPI";
+import { useAuth } from "../../contexts/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Select } from "../ui";
 
-// Sample data - in real implementation, this would come from API
-const generateSampleData = () => {
-  const today = new Date();
-  const dailyData = [];
-  const weeklyData = [];
-  const monthlyData = [];
-
-  // Generate daily data for last 30 days
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    dailyData.push({
-      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      requests: Math.floor(Math.random() * 15) + 5,
-      completed: Math.floor(Math.random() * 10) + 3,
-      pending: Math.floor(Math.random() * 8) + 2
-    });
-  }
-
-  // Generate weekly data for last 12 weeks
-  for (let i = 11; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - (i * 7));
-    weeklyData.push({
-      week: `Week ${12 - i}`,
-      requests: Math.floor(Math.random() * 50) + 20,
-      completed: Math.floor(Math.random() * 35) + 15,
-      pending: Math.floor(Math.random() * 25) + 5
-    });
-  }
-
-  // Generate monthly data for last 6 months
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  for (let i = 5; i >= 0; i--) {
-    const date = new Date(today);
-    date.setMonth(date.getMonth() - i);
-    monthlyData.push({
-      month: monthNames[date.getMonth()],
-      requests: Math.floor(Math.random() * 200) + 100,
-      completed: Math.floor(Math.random() * 150) + 80,
-      pending: Math.floor(Math.random() * 80) + 20
-    });
-  }
-
-  return { dailyData, weeklyData, monthlyData };
+// Generate sample trend data for charts
+const generateTrendData = (baseValue, label) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  return months.map((month, index) => ({
+    name: month,
+    [label]: Math.floor(baseValue * (0.7 + Math.random() * 0.6) * (1 + index * 0.1))
+  }));
 };
 
-// Blood group distribution data
-const bloodGroupData = [
-  { name: 'O+', value: 35, fill: '#ef4444' },
-  { name: 'A+', value: 30, fill: '#f97316' },
-  { name: 'B+', value: 15, fill: '#eab308' },
-  { name: 'AB+', value: 8, fill: '#22c55e' },
-  { name: 'O-', value: 5, fill: '#3b82f6' },
-  { name: 'A-', value: 4, fill: '#8b5cf6' },
-  { name: 'B-', value: 2, fill: '#ec4899' },
-  { name: 'AB-', value: 1, fill: '#06b6d4' }
-];
+const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
-};
+export default function DonationAnalytics() {
+    const [timeframe, setTimeframe] = useState('monthly');
+    const { user } = useAuth();
+    const adminAPI = useAdminAPI();
+    const donationAPI = useDonationAPI();
+    const fundingAPI = useFundingAPI();
 
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1
+    // Check if user has permission to view analytics
+    const hasAnalyticsPermission = user && (user.role === 'admin' || user.role === 'volunteer');
+
+    // Only make API calls if user has permission
+    const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useQuery({
+        queryKey: ['analytics', timeframe],
+        queryFn: () => adminAPI.getAnalytics({ timeframe }),
+        enabled: hasAnalyticsPermission,
+        retry: (failureCount, error) => {
+            // Don't retry on permission errors
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+                return false;
+            }
+            return failureCount < 2;
+        }
+    });
+
+    const { data: bloodGroupData, isLoading: bloodGroupLoading, error: bloodGroupError } = useQuery({
+        queryKey: ['analytics-blood-groups'],
+        queryFn: () => adminAPI.getBloodGroupAnalytics(),
+        enabled: hasAnalyticsPermission,
+        retry: (failureCount, error) => {
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+                return false;
+            }
+            return failureCount < 2;
+        }
+    });
+
+    const { data: donationStats, isLoading: donationStatsLoading, error: donationStatsError } = useQuery({
+        queryKey: ['donation-stats'],
+        queryFn: () => donationAPI.getStats(),
+        enabled: hasAnalyticsPermission,
+        retry: (failureCount, error) => {
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+                return false;
+            }
+            return failureCount < 2;
+        }
+    });
+
+    const { data: fundingStats, isLoading: fundingStatsLoading, error: fundingStatsError } = useQuery({
+        queryKey: ['funding-stats'],
+        queryFn: () => fundingAPI.getStats(),
+        enabled: hasAnalyticsPermission,
+        retry: (failureCount, error) => {
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+                return false;
+            }
+            return failureCount < 2;
+        }
+    });
+
+    // Check for permission errors specifically
+    const hasPermissionError = [analyticsError, bloodGroupError, donationStatsError, fundingStatsError]
+        .some(error => error?.response?.status === 403 || error?.response?.status === 401);
+
+    const hasServerError = [analyticsError, bloodGroupError, donationStatsError, fundingStatsError]
+        .some(error => error?.response?.status >= 500);
+
+    const isLoading = analyticsLoading || bloodGroupLoading || donationStatsLoading || fundingStatsLoading;
+
+    // Permission check - show message if user doesn't have permission
+    if (!hasAnalyticsPermission) {
+        return (
+            <div className="space-y-6">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12"
+                >
+                    <div className="mx-auto w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                        <FaChartArea className="w-12 h-12 text-yellow-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Analytics Access Required</h3>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                        Analytics data is only available to administrators and volunteers. 
+                        Please contact your administrator if you need access to this information.
+                    </p>
+                </motion.div>
+            </div>
+        );
     }
-  }
-};
 
-function DonationAnalytics() {
-  const [timeframe, setTimeframe] = useState('daily');
-  const [chartType, setChartType] = useState('area');
-  const [data, setData] = useState({});
-
-  useEffect(() => {
-    setData(generateSampleData());
-  }, []);
-
-  const getCurrentData = () => {
-    switch (timeframe) {
-      case 'weekly':
-        return data.weeklyData || [];
-      case 'monthly':
-        return data.monthlyData || [];
-      default:
-        return data.dailyData || [];
+    // Handle permission errors
+    if (hasPermissionError) {
+        return (
+            <div className="space-y-6">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12"
+                >
+                    <div className="mx-auto w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                        <FaChartArea className="w-12 h-12 text-red-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h3>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                        You don't have permission to view analytics data. Your session may have expired. 
+                        Please log out and log back in.
+                    </p>
+                </motion.div>
+            </div>
+        );
     }
-  };
 
-  const getXAxisKey = () => {
-    switch (timeframe) {
-      case 'weekly':
-        return 'week';
-      case 'monthly':
-        return 'month';
-      default:
-        return 'date';
+    // Handle server errors
+    if (hasServerError) {
+        return (
+            <div className="space-y-6">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12"
+                >
+                    <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <FaChartArea className="w-12 h-12 text-gray-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Server Error</h3>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                        There was an error loading analytics data from the server. 
+                        Please try again later or contact support.
+                    </p>
+                </motion.div>
+            </div>
+        );
     }
-  };
 
-  const renderChart = () => {
-    const currentData = getCurrentData();
-    const xAxisKey = getXAxisKey();
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-center py-12">
+                    <LoadingSpinner size="lg" />
+                    <span className="ml-3 text-lg text-gray-600">Loading analytics data...</span>
+                </div>
+            </div>
+        );
+    }
 
-    const commonProps = {
-      data: currentData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 }
+    // Process the data for charts
+    const processedData = {
+        userStats: analyticsData?.users || {},
+        donationStats: analyticsData?.donations || donationStats || {},
+        fundingStats: analyticsData?.funding || fundingStats || {},
+        bloodGroups: bloodGroupData || []
     };
 
-    switch (chartType) {
-      case 'bar':
-        return (
-          <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="requests" fill="#ef4444" name="Total Requests" />
-            <Bar dataKey="completed" fill="#22c55e" name="Completed" />
-            <Bar dataKey="pending" fill="#f59e0b" name="Pending" />
-          </BarChart>
-        );
-      case 'line':
-        return (
-          <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="requests" stroke="#ef4444" strokeWidth={2} name="Total Requests" />
-            <Line type="monotone" dataKey="completed" stroke="#22c55e" strokeWidth={2} name="Completed" />
-            <Line type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={2} name="Pending" />
-          </LineChart>
-        );
-      default:
-        return (
-          <AreaChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Area type="monotone" dataKey="requests" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name="Total Requests" />
-            <Area type="monotone" dataKey="completed" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} name="Completed" />
-            <Area type="monotone" dataKey="pending" stackId="1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.6} name="Pending" />
-          </AreaChart>
-        );
-    }
-  };
+    // Generate trend data based on actual stats
+    const donationTrends = generateTrendData(processedData.donationStats.totalRequests || 0, 'donations');
+    const userGrowth = generateTrendData(processedData.userStats.totalUsers || 0, 'users');
+    const fundingTrends = generateTrendData(processedData.fundingStats.totalAmount || 0, 'amount');
 
-  return (
-    <motion.div
-      className="space-y-6"
-      initial="initial"
-      animate="animate"
-      variants={staggerContainer}
-    >
-      {/* Chart Controls */}
-      <motion.div 
-        className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center"
-        variants={fadeInUp}
-      >
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-          <FaChartArea className="text-red-600" />
-          <span>Donation Analytics</span>
-        </h2>
-        
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Select
-            value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value)}
-            className="min-w-[120px]"
-          >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </Select>
-          
-          <Select
-            value={chartType}
-            onChange={(e) => setChartType(e.target.value)}
-            className="min-w-[120px]"
-          >
-            <option value="area">Area Chart</option>
-            <option value="bar">Bar Chart</option>
-            <option value="line">Line Chart</option>
-          </Select>
+    // Prepare status distribution data
+    const statusData = [
+        { name: 'Pending', value: processedData.donationStats.pendingRequests || 0, color: '#eab308' },
+        { name: 'Completed', value: processedData.donationStats.completedRequests || 0, color: '#22c55e' },
+        { name: 'In Progress', value: processedData.donationStats.inProgressRequests || 0, color: '#3b82f6' },
+        { name: 'Canceled', value: processedData.donationStats.canceledRequests || 0, color: '#ef4444' }
+    ].filter(item => item.value > 0);
+
+    return (
+        <div className="space-y-6">
+            {/* Header with time filter */}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-between items-center"
+            >
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        <FaChartArea className="text-red-600" />
+                        Donation Analytics
+                    </h1>
+                    <p className="text-gray-600 mt-1">Comprehensive insights into donation patterns and statistics</p>
+                </div>
+                <Select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
+                    <option value="monthly">Monthly View</option>
+                    <option value="quarterly">Quarterly View</option>
+                    <option value="yearly">Yearly View</option>
+                </Select>
+            </motion.div>
+
+            {/* Summary Cards */}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-600">Total Donations</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {processedData.donationStats.totalRequests || 0}
+                                </p>
+                            </div>
+                            <FaChartLine className="h-8 w-8 text-red-500" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-600">Active Donors</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {processedData.userStats.totalUsers || 0}
+                                </p>
+                            </div>
+                            <FaChartBar className="h-8 w-8 text-blue-500" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-600">Success Rate</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {processedData.donationStats.totalRequests > 0 
+                                        ? Math.round((processedData.donationStats.completedRequests / processedData.donationStats.totalRequests) * 100)
+                                        : 0}%
+                                </p>
+                            </div>
+                            <FaCalendarAlt className="h-8 w-8 text-green-500" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-600">Total Funding</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    ${(processedData.fundingStats.totalAmount || 0).toLocaleString()}
+                                </p>
+                            </div>
+                            <FaChartArea className="h-8 w-8 text-purple-500" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </motion.div>
+
+            {/* Charts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Donation Trends */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Donation Trends</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={donationTrends}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="donations" 
+                                        stroke="#ef4444" 
+                                        fill="#fee2e2" 
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Status Distribution */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                >
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Request Status Distribution</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={statusData}
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    >
+                                        {statusData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* User Growth */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                >
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>User Growth</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={userGrowth}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line 
+                                        type="monotone" 
+                                        dataKey="users" 
+                                        stroke="#3b82f6" 
+                                        strokeWidth={2} 
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Blood Group Distribution */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Blood Group Distribution</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={processedData.bloodGroups}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="bloodGroup" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Bar dataKey="count" fill="#ef4444" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </div>
+
+            {/* Funding Trends */}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+            >
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Funding Trends</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <AreaChart data={fundingTrends}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="amount" 
+                                    stroke="#8b5cf6" 
+                                    fill="#f3e8ff" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+            </motion.div>
         </div>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Chart */}
-        <motion.div className="lg:col-span-2" variants={fadeInUp}>
-          <Card className="hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                {chartType === 'bar' ? <FaChartBar className="text-blue-600" /> :
-                 chartType === 'line' ? <FaChartLine className="text-green-600" /> :
-                 <FaChartArea className="text-purple-600" />}
-                <span className="capitalize">{timeframe} Donation Requests</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  {renderChart()}
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Blood Group Distribution */}
-        <motion.div variants={fadeInUp}>
-          <Card className="hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FaCalendarAlt className="text-red-600" />
-                <span>Blood Group Distribution</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={bloodGroupData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {bloodGroupData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Summary Statistics */}
-      <motion.div 
-        className="grid grid-cols-1 md:grid-cols-4 gap-4"
-        variants={fadeInUp}
-      >
-        <Card className="bg-red-50 border-red-200 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-red-600">Today's Requests</p>
-                <p className="text-2xl font-bold text-red-900">12</p>
-              </div>
-              <div className="bg-red-100 p-2 rounded-full">
-                <FaCalendarAlt className="h-5 w-5 text-red-600" />
-              </div>
-            </div>
-            <p className="text-xs text-red-700 mt-1">+20% from yesterday</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-green-50 border-green-200 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600">Completed Today</p>
-                <p className="text-2xl font-bold text-green-900">8</p>
-              </div>
-              <div className="bg-green-100 p-2 rounded-full">
-                <FaChartLine className="h-5 w-5 text-green-600" />
-              </div>
-            </div>
-            <p className="text-xs text-green-700 mt-1">67% completion rate</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-yellow-50 border-yellow-200 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-yellow-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-900">4</p>
-              </div>
-              <div className="bg-yellow-100 p-2 rounded-full">
-                <FaChartBar className="h-5 w-5 text-yellow-600" />
-              </div>
-            </div>
-            <p className="text-xs text-yellow-700 mt-1">Awaiting donors</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-blue-50 border-blue-200 hover:shadow-lg transition-shadow duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600">This Month</p>
-                <p className="text-2xl font-bold text-blue-900">156</p>
-              </div>
-              <div className="bg-blue-100 p-2 rounded-full">
-                <FaChartArea className="h-5 w-5 text-blue-600" />
-              </div>
-            </div>
-            <p className="text-xs text-blue-700 mt-1">+15% from last month</p>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-export default DonationAnalytics; 
+    );
+} 

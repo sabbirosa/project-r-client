@@ -166,7 +166,7 @@ function PaymentForm({ amount, onSuccess, onCancel }) {
         )}
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+      <div className="bg-blue-50 border border-b border-gray-200lue-200 rounded-md p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <FaCreditCard className="h-5 w-5 text-blue-400" />
@@ -339,7 +339,7 @@ function Funding() {
           </Card>
 
           {/* Total Donors */}
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-b border-gray-200lue-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

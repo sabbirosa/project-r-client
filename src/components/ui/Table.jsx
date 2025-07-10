@@ -14,7 +14,7 @@ const Table = forwardRef(({ className, ...props }, ref) => (
 const TableHeader = forwardRef(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn("[&_tr]:border-b", className)}
+    className={cn("[&_tr]:border-b border-gray-200", className)}
     {...props}
   />
 ));
@@ -30,7 +30,7 @@ const TableBody = forwardRef(({ className, ...props }, ref) => (
 const TableFooter = forwardRef(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
-    className={cn("bg-gray-900/5 font-medium [&>tr]:last:border-b-0", className)}
+    className={cn("bg-gray-900/5 font-medium [&>tr]:last:border-b border-gray-200-0", className)}
     {...props}
   />
 ));
@@ -39,7 +39,7 @@ const TableRow = forwardRef(({ className, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-gray-50/50 data-[state=selected]:bg-gray-50",
+      "border-b border-gray-200 transition-colors hover:bg-gray-50/50 data-[state=selected]:bg-gray-50",
       className
     )}
     {...props}

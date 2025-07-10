@@ -157,7 +157,7 @@ function Dashboard() {
         >
           {/* Total Users */}
           <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-b border-gray-200lue-200 hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>

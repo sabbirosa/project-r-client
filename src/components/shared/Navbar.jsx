@@ -20,7 +20,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg border-b border-red-100">
+    <nav className="bg-white shadow-lg border-b border-gray-200 border-red-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Logo and Brand */}
@@ -107,7 +107,7 @@ function Navbar() {
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
-                      <div className="px-4 py-2 border-b border-gray-100">
+                      <div className="px-4 py-2 border-b border-gray-200 border-gray-100">
                         <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                         <p className="text-sm text-gray-500">{user?.email}</p>
                         <p className="text-xs text-gray-400 capitalize">{user?.role}</p>

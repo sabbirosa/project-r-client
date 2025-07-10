@@ -11,6 +11,7 @@ import ContentManagement from "../pages/ContentManagement";
 import CreateDonationRequest from "../pages/CreateDonationRequest";
 import Dashboard from "../pages/Dashboard";
 import DonationRequestDetails from "../pages/DonationRequestDetails";
+import EditBlog from "../pages/EditBlog";
 import EditDonationRequest from "../pages/EditDonationRequest";
 import Funding from "../pages/Funding";
 import Home from "../pages/Home";
@@ -109,7 +110,7 @@ const router = createBrowserRouter([
         path: "content-management/edit-blog/:id",
         element: (
           <PrivateRoute requiredRoles={["admin", "volunteer"]}>
-            <div>Edit Blog</div> {/* TODO: Create this component */}
+            <EditBlog />
           </PrivateRoute>
         )
       },
