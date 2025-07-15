@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { FaCalendar, FaCreditCard, FaDonate, FaMoneyBillWave, FaPlus, FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
 import useFundingAPI from "../api/useFundingAPI";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Modal, Pagination, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
+import { Badge, Button, Card, CardContent, Input, LoadingSpinner, Modal, Pagination, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 
 // Initialize Stripe with error handling
@@ -285,35 +285,35 @@ function Funding() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header with Give Fund Button */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-              <FaMoneyBillWave className="text-green-600" />
-              <span>Funding</span>
-            </CardTitle>
-            <Button 
-              onClick={() => setShowDonateModal(true)}
-              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
-            >
-              <FaPlus className="h-4 w-4" />
-              <span>Give Fund</span>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            Support our blood donation organization by making a financial contribution. 
-            Your donations help us maintain our platform and support life-saving activities.
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <FaMoneyBillWave className="h-16 w-16 mx-auto mb-6 text-green-200" />
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            Support Our Mission
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+            Your financial support helps us save lives by maintaining our platform and supporting blood donation activities
           </p>
-        </CardContent>
-      </Card>
+          <Button 
+            onClick={() => setShowDonateModal(true)}
+            size="lg"
+            className="text-green-600 hover:bg-gray-100 flex items-center space-x-2 mx-auto"
+          >
+            <FaPlus className="h-5 w-5" />
+            <span>Donate Now</span>
+          </Button>
+        </div>
+      </section>
 
-      {/* Statistics Cards */}
-      {fundingStats && !statsLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+
+        {/* Statistics Cards */}
+        <section className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Our Impact Together</h2>
+          {fundingStats && !statsLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Total Funding */}
           <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <CardContent className="p-6">
@@ -367,17 +367,16 @@ function Funding() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      )}
+            </div>
+          )}
+        </section>
 
-      {/* Funding Records Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-900">
-            Funding Records
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        {/* Recent Donations Section */}
+        <section className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Recent Donations</h2>
+          <p className="text-gray-600 text-center mb-8">Thank you to our generous supporters</p>
+          
+          <div>
           {isLoading ? (
             <div className="flex justify-center items-center py-8">
               <LoadingSpinner size="lg" text="Loading funding records..." />
@@ -461,8 +460,8 @@ function Funding() {
               )}
             </>
           )}
-        </CardContent>
-      </Card>
+          </div>
+        </section>
 
       {/* Donation Modal */}
       <Modal
@@ -553,6 +552,7 @@ function Funding() {
           )}
         </div>
       </Modal>
+      </div>
     </div>
   );
 }

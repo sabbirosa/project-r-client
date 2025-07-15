@@ -48,7 +48,39 @@ const router = createBrowserRouter([
           </PublicRoute>
         ),
       },
-      // Add more public routes here (search, blog, donation-requests, etc.)
+      {
+        path: "funding",
+        element: (
+          <PrivateRoute>
+            <Funding />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "search",
+        element: <SearchDonors />,
+      },
+      {
+        path: "donation-requests",
+        element: <BloodDonationRequests />,
+      },
+      {
+        path: "donation-requests/:id",
+        element: (
+          <PrivateRoute>
+            <DonationRequestDetails />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "blog",
+        element: <Blog />,
+      },
+      {
+        path: "blog/:id",
+        element: <BlogDetails />,
+      },
+      // Add more public routes here
     ],
   },
   {
@@ -124,41 +156,8 @@ const router = createBrowserRouter([
           </PrivateRoute>
         )
       },
-      {
-        path: "funding",
-        element: (
-          <PrivateRoute>
-            <Funding />
-          </PrivateRoute>
-        )
-      },
+
     ],
-  },
-  
-  // Public routes outside of main layout
-  {
-    path: "search",
-    element: <SearchDonors />,
-  },
-  {
-    path: "donation-requests",
-    element: <BloodDonationRequests />,
-  },
-  {
-    path: "donation-requests/:id",
-    element: (
-      <PrivateRoute>
-        <DonationRequestDetails />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "blog",
-    element: <Blog />,
-  },
-  {
-    path: "blog/:id",
-    element: <BlogDetails />,
   },
   
   // 404 Route

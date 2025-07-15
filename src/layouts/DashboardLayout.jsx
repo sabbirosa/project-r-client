@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaBars, FaChartBar, FaHandHoldingHeart, FaHandsHelping, FaHome, FaTimes, FaTint, FaUser, FaUsers } from "react-icons/fa";
+import { FaBars, FaChartBar, FaHandHoldingHeart, FaHome, FaTimes, FaTint, FaUser, FaUsers } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router";
 import Logo from "../components/shared/Logo";
 import { Button } from "../components/ui";
@@ -64,11 +64,6 @@ function DashboardLayout() {
         name: "All Users",
         href: "/dashboard/all-users",
         icon: FaUsers
-      },
-      {
-        name: "Funding",
-        href: "/dashboard/funding",
-        icon: FaHandsHelping
       }
     ];
 

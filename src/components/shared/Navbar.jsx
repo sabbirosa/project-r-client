@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaBlog, FaChevronDown, FaDonate, FaHome, FaSignInAlt, FaSignOutAlt, FaTachometerAlt, FaUser, FaUserPlus } from "react-icons/fa";
+import { FaChevronDown, FaSignInAlt, FaSignOutAlt, FaTachometerAlt, FaUser, FaUserPlus } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
 import Logo from "./Logo";
@@ -32,7 +32,7 @@ function Navbar() {
                 to="/"
                 className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
               >
-                <FaHome className="h-4 w-4" />
+                {/* <FaHome className="h-4 w-4" /> */}
                 <span>Home</span>
               </Link>
               
@@ -47,7 +47,7 @@ function Navbar() {
                 to="/blog"
                 className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
               >
-                <FaBlog className="h-4 w-4" />
+                {/* <FaBlog className="h-4 w-4" /> */}
                 <span>Blog</span>
               </Link>
 
@@ -56,7 +56,7 @@ function Navbar() {
                   to="/funding"
                   className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
                 >
-                  <FaDonate className="h-4 w-4" />
+                  {/* <FaDonate className="h-4 w-4" /> */}
                   <span>Funding</span>
                 </Link>
               )}
