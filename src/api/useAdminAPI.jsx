@@ -47,6 +47,16 @@ function useAdminAPI() {
     });
   };
 
+  const useGetDashboardAnalytics = () => {
+    return useQuery({
+      queryKey: ["admin", "dashboard", "analytics"],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/admin/dashboard/analytics");
+        return response.data;
+      },
+    });
+  };
+
   const useGetAnalyticsData = (params = {}) => {
     return useQuery({
       queryKey: ["admin", "analytics", params],
@@ -244,6 +254,7 @@ function useAdminAPI() {
     useGetAllBlogs,
     useGetBlogById,
     useGetDashboardStats,
+    useGetDashboardAnalytics,
     useGetAnalyticsData,
     useGetBloodGroupDistribution,
     useGetTrendData,

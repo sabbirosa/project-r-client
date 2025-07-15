@@ -24,15 +24,6 @@ import useFundingAPI from "../../api/useFundingAPI";
 import { useAuth } from "../../contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Select } from "../ui";
 
-// Generate sample trend data for charts
-const generateTrendData = (baseValue, label) => {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-  return months.map((month, index) => ({
-    name: month,
-    [label]: Math.floor(baseValue * (0.7 + Math.random() * 0.6) * (1 + index * 0.1))
-  }));
-};
-
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
 
 export default function DonationAnalytics() {
@@ -46,7 +37,7 @@ export default function DonationAnalytics() {
     const hasAnalyticsPermission = user && (user.role === 'admin' || user.role === 'volunteer');
 
     // Only make API calls if user has permission
-    const { useGetAnalyticsData } = useAdminAPI();
+    const { useGetAnalyticsData, useGetBloodGroupDistribution, useGetTrendData, useGetFundingStats } = useAdminAPI();
     const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useGetAnalyticsData({ timeframe }, {
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
@@ -58,8 +49,18 @@ export default function DonationAnalytics() {
         }
     });
 
-    const { useGetBloodGroupDistribution } = useAdminAPI();
     const { data: bloodGroupData, isLoading: bloodGroupLoading, error: bloodGroupError } = useGetBloodGroupDistribution({
+        enabled: hasAnalyticsPermission,
+        retry: (failureCount, error) => {
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+                return false;
+            }
+            return failureCount < 2;
+        }
+    });
+
+    // Get real trend data instead of generating fake data
+    const { data: trendData, isLoading: trendLoading, error: trendError } = useGetTrendData(timeframe, {
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
             if (error?.response?.status === 403 || error?.response?.status === 401) {
@@ -80,8 +81,7 @@ export default function DonationAnalytics() {
         }
     });
 
-    const { useGetFundingStats: useFundingStatsHook } = useFundingAPI();
-    const { data: fundingStats, isLoading: fundingStatsLoading, error: fundingStatsError } = useFundingStatsHook({
+    const { data: fundingStats, isLoading: fundingStatsLoading, error: fundingStatsError } = useGetFundingStats({
         enabled: hasAnalyticsPermission,
         retry: (failureCount, error) => {
             if (error?.response?.status === 403 || error?.response?.status === 401) {
@@ -92,13 +92,13 @@ export default function DonationAnalytics() {
     });
 
     // Check for permission errors specifically
-    const hasPermissionError = [analyticsError, bloodGroupError, donationStatsError, fundingStatsError]
+    const hasPermissionError = [analyticsError, bloodGroupError, donationStatsError, fundingStatsError, trendError]
         .some(error => error?.response?.status === 403 || error?.response?.status === 401);
 
-    const hasServerError = [analyticsError, bloodGroupError, donationStatsError, fundingStatsError]
+    const hasServerError = [analyticsError, bloodGroupError, donationStatsError, fundingStatsError, trendError]
         .some(error => error?.response?.status >= 500);
 
-    const isLoading = analyticsLoading || bloodGroupLoading || donationStatsLoading || fundingStatsLoading;
+    const isLoading = analyticsLoading || bloodGroupLoading || donationStatsLoading || fundingStatsLoading || trendLoading;
 
     // Permission check - show message if user doesn't have permission
     if (!hasAnalyticsPermission) {
@@ -178,25 +178,38 @@ export default function DonationAnalytics() {
         );
     }
 
-    // Process the data for charts
+    // Process the data for charts using real API data
     const processedData = {
         userStats: analyticsData?.users || {},
         donationStats: analyticsData?.donations || donationStats || {},
         fundingStats: analyticsData?.funding || fundingStats || {},
-        bloodGroups: bloodGroupData || []
+        bloodGroups: bloodGroupData?.bloodGroups || []
     };
 
-    // Generate trend data based on actual stats
-    const donationTrends = generateTrendData(processedData.donationStats.totalRequests || 0, 'donations');
-    const userGrowth = generateTrendData(processedData.userStats.totalUsers || 0, 'users');
-    const fundingTrends = generateTrendData(processedData.fundingStats.totalAmount || 0, 'amount');
+    // Use real trend data from API instead of generating fake data
+    const donationTrends = trendData?.data?.map(item => ({
+        name: item.period,
+        donations: item.requests,
+        completed: item.completed,
+        pending: item.pending
+    })) || [];
 
-    // Prepare status distribution data
+    const userGrowth = trendData?.data?.map(item => ({
+        name: item.period,
+        users: item.newUsers
+    })) || [];
+
+    const fundingTrends = trendData?.data?.map(item => ({
+        name: item.period,
+        amount: item.fundingAmount
+    })) || [];
+
+    // Prepare status distribution data using real data
     const statusData = [
-        { name: 'Pending', value: processedData.donationStats.pendingRequests || 0, color: '#eab308' },
-        { name: 'Completed', value: processedData.donationStats.completedRequests || 0, color: '#22c55e' },
-        { name: 'In Progress', value: processedData.donationStats.inProgressRequests || 0, color: '#3b82f6' },
-        { name: 'Canceled', value: processedData.donationStats.canceledRequests || 0, color: '#ef4444' }
+        { name: 'Pending', value: processedData.donationStats.pendingRequests || processedData.donationStats.pending || 0, color: '#eab308' },
+        { name: 'Completed', value: processedData.donationStats.completedRequests || processedData.donationStats.completed || 0, color: '#22c55e' },
+        { name: 'In Progress', value: processedData.donationStats.inProgressRequests || processedData.donationStats.inProgress || 0, color: '#3b82f6' },
+        { name: 'Canceled', value: processedData.donationStats.canceledRequests || processedData.donationStats.canceled || 0, color: '#ef4444' }
     ].filter(item => item.value > 0);
 
     return (
@@ -215,9 +228,9 @@ export default function DonationAnalytics() {
                     <p className="text-gray-600 mt-1">Comprehensive insights into donation patterns and statistics</p>
                 </div>
                 <Select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
+                    <option value="daily">Daily View</option>
+                    <option value="weekly">Weekly View</option>
                     <option value="monthly">Monthly View</option>
-                    <option value="quarterly">Quarterly View</option>
-                    <option value="yearly">Yearly View</option>
                 </Select>
             </motion.div>
 
@@ -234,7 +247,7 @@ export default function DonationAnalytics() {
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Total Donations</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {processedData.donationStats.totalRequests || 0}
+                                    {processedData.donationStats.totalRequests || processedData.donationStats.total || 0}
                                 </p>
                             </div>
                             <FaChartLine className="h-8 w-8 text-red-500" />
@@ -248,7 +261,7 @@ export default function DonationAnalytics() {
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Active Donors</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {processedData.userStats.totalUsers || 0}
+                                    {processedData.userStats.totalUsers || processedData.userStats.total || 0}
                                 </p>
                             </div>
                             <FaChartBar className="h-8 w-8 text-blue-500" />
@@ -262,8 +275,8 @@ export default function DonationAnalytics() {
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Success Rate</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {processedData.donationStats.totalRequests > 0 
-                                        ? Math.round((processedData.donationStats.completedRequests / processedData.donationStats.totalRequests) * 100)
+                                    {(processedData.donationStats.totalRequests || processedData.donationStats.total) > 0 
+                                        ? Math.round(((processedData.donationStats.completedRequests || processedData.donationStats.completed || 0) / (processedData.donationStats.totalRequests || processedData.donationStats.total)) * 100)
                                         : 0}%
                                 </p>
                             </div>
@@ -395,7 +408,7 @@ export default function DonationAnalytics() {
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart data={processedData.bloodGroups}>
                                     <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="bloodGroup" />
+                                    <XAxis dataKey="name" />
                                     <YAxis />
                                     <Tooltip />
                                     <Bar dataKey="count" fill="#ef4444" />
