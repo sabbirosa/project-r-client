@@ -9,7 +9,7 @@ const axiosSecure = axios.create({
 });
 
 function useAxiosSecure() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
   axiosSecure.interceptors.request.use((config) => {
     if (token) {
@@ -22,7 +22,18 @@ function useAxiosSecure() {
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
-        console.error("Unauthorized - maybe redirect to login");
+        console.error("Unauthorized access - token may be expired");
+        
+        // Only auto-logout for auth-related endpoints, not for image uploads or other operations
+        const isAuthEndpoint = error.config?.url?.includes('/auth/');
+        const isProfileEndpoint = error.config?.url?.includes('/auth/profile');
+        
+        if (isAuthEndpoint && !isProfileEndpoint) {
+          console.log("Authentication endpoint failed - logging out");
+          logout();
+        } else {
+          console.warn("Non-auth endpoint returned 401 - not auto-logging out");
+        }
       }
       return Promise.reject(error);
     }

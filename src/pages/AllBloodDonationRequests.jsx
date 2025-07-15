@@ -39,8 +39,8 @@ function AllBloodDonationRequests() {
   const { useUpdateStatus } = useDonationAPI();
   const { mutate: updateStatusMutation } = useUpdateStatus();
 
-  const handleStatusUpdate = (requestId, newStatus) => {
-    updateStatusMutation({ requestId, status: newStatus }, {
+  const handleStatusUpdate = (id, newStatus) => {
+    updateStatusMutation({ id, status: newStatus }, {
       onSuccess: () => {
         toast.success(`Request status updated to ${newStatus}!`);
         refetch();

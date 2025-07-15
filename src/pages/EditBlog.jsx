@@ -174,6 +174,9 @@ function EditBlog() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Session Debugger - Remove after fixing the issue */}
+      <SessionDebugger label="EditBlog Session Monitor" />
+      
       {/* Header */}
       <Card>
         <CardHeader>

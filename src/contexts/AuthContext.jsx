@@ -157,7 +157,8 @@ export const AuthProvider = ({ children }) => {
   const updateUserData = async () => {
     try {
       if (!token) {
-        throw new Error("No authentication token available");
+        console.warn("No authentication token available for updateUserData");
+        return { success: false, error: "No authentication token available" };
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
@@ -169,19 +170,41 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch user data");
+        // Don't clear user data on network errors or server errors
+        if (response.status >= 500) {
+          console.error("Server error during updateUserData:", response.status);
+          return { success: false, error: "Server error - keeping existing user data" };
+        }
+        
+        // Only clear user data on authentication errors (401/403)
+        if (response.status === 401 || response.status === 403) {
+          console.warn("Authentication failed during updateUserData - clearing session");
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem("bloodDonation_user");
+          localStorage.removeItem("bloodDonation_token");
+          return { success: false, error: "Authentication failed" };
+        }
+        
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: Failed to fetch user data`);
       }
 
       const data = await response.json();
       
-      // Update user state with fresh data
-      setUser(data);
-      localStorage.setItem("bloodDonation_user", JSON.stringify(data));
-      
-      return { success: true, user: data };
+      // Only update if we got valid user data
+      if (data && (data._id || data.id)) {
+        setUser(data);
+        localStorage.setItem("bloodDonation_user", JSON.stringify(data));
+        console.log("User data updated successfully");
+        return { success: true, user: data };
+      } else {
+        console.error("Invalid user data received:", data);
+        return { success: false, error: "Invalid user data received" };
+      }
     } catch (error) {
       console.error("Update user data error:", error);
+      // Don't clear user data on network/fetch errors
       return { success: false, error: error.message };
     }
   };

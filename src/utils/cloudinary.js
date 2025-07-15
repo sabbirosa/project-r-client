@@ -64,6 +64,15 @@ export const uploadToCloudinary = async (imageFile) => {
   console.log('📤 Uploading to:', uploadUrl);
 
   try {
+    // Check if user session is still valid before upload
+    const userSession = localStorage.getItem("bloodDonation_user");
+    const tokenSession = localStorage.getItem("bloodDonation_token");
+    console.log('🔐 Session check before upload:', {
+      hasUser: !!userSession,
+      hasToken: !!tokenSession,
+      timestamp: new Date().toISOString()
+    });
+
     const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData,
@@ -85,6 +94,16 @@ export const uploadToCloudinary = async (imageFile) => {
       throw new Error(data.error.message || 'Upload failed');
     }
 
+    // Check if user session is still valid after upload
+    const userSessionAfter = localStorage.getItem("bloodDonation_user");
+    const tokenSessionAfter = localStorage.getItem("bloodDonation_token");
+    console.log('🔐 Session check after upload:', {
+      hasUser: !!userSessionAfter,
+      hasToken: !!tokenSessionAfter,
+      changed: userSession !== userSessionAfter || tokenSession !== tokenSessionAfter,
+      timestamp: new Date().toISOString()
+    });
+
     console.log('✅ Upload successful:', data.secure_url);
 
     return {
@@ -100,6 +119,16 @@ export const uploadToCloudinary = async (imageFile) => {
     };
   } catch (error) {
     console.error('❌ Cloudinary upload error:', error);
+    
+    // Check session after error
+    const userSessionAfterError = localStorage.getItem("bloodDonation_user");
+    const tokenSessionAfterError = localStorage.getItem("bloodDonation_token");
+    console.log('🔐 Session check after error:', {
+      hasUser: !!userSessionAfterError,
+      hasToken: !!tokenSessionAfterError,
+      timestamp: new Date().toISOString()
+    });
+    
     throw error;
   }
 }; 

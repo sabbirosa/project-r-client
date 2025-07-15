@@ -151,8 +151,17 @@ function Profile() {
 
       updateProfileMutation(updateData, {
         onSuccess: async () => {
-          // Update user data in context
-          await updateUserData();
+          try {
+            // Update user data in context - but don't fail the whole process if this fails
+            const updateResult = await updateUserData();
+            if (!updateResult.success) {
+              console.warn("Failed to refresh user data after profile update:", updateResult.error);
+              // Don't show error to user since the profile update was successful
+            }
+          } catch (error) {
+            console.error("Error refreshing user data:", error);
+            // Don't fail the whole process just because user data refresh failed
+          }
           
           // Invalidate and refetch profile data
           queryClient.invalidateQueries(['auth', 'profile']);
