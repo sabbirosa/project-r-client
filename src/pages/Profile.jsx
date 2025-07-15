@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import useAuthAPI from "../api/useAuthAPI";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, Select } from "../components/ui";
-import { districts, getUpazilaById, getUpazilasbyDistrictId } from "../constants/bdLocations";
+import { districts, getUpazilasbyDistrictName } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -56,9 +56,9 @@ function Profile() {
       setSelectedDistrict(profileData.district || "");
       setAvatarPreview(profileData.avatar || null);
       
-      // Filter upazilas based on district using new utility function
+      // Filter upazilas based on district using district name
       if (profileData.district) {
-        const filtered = getUpazilasbyDistrictId(profileData.district);
+        const filtered = getUpazilasbyDistrictName(profileData.district);
         setFilteredUpazilas(filtered);
       }
     }
@@ -69,8 +69,8 @@ function Profile() {
       setSelectedDistrict(watchedDistrict);
       setValue("upazila", ""); // Reset upazila when district changes
       
-      // Use the new utility function for filtering upazilas
-      const filtered = getUpazilasbyDistrictId(watchedDistrict);
+      // Use district name for filtering upazilas
+      const filtered = getUpazilasbyDistrictName(watchedDistrict);
       setFilteredUpazilas(filtered);
     }
   }, [watchedDistrict, selectedDistrict, setValue]);
@@ -155,7 +155,7 @@ function Profile() {
           await updateUserData();
           
           // Invalidate and refetch profile data
-          queryClient.invalidateQueries(['userProfile']);
+          queryClient.invalidateQueries(['auth', 'profile']);
           
           toast.success("Profile updated successfully!");
           setIsEditing(false);
@@ -194,14 +194,14 @@ function Profile() {
     }
   };
 
-  const getDistrictName = (districtId) => {
-    const district = districts.find(d => d.id === districtId);
-    return district ? district.name : districtId;
+  const getDistrictName = (districtName) => {
+    // Since database stores names, just return the name
+    return districtName || "";
   };
 
-  const getUpazilaName = (upazilaId) => {
-    const upazila = getUpazilaById(upazilaId);
-    return upazila ? upazila.name : upazilaId;
+  const getUpazilaName = (upazilaName) => {
+    // Since database stores names, just return the name
+    return upazilaName || "";
   };
 
   const getBloodGroupLabel = (bloodGroupValue) => {
@@ -221,7 +221,7 @@ function Profile() {
     return (
       <div className="text-center py-12">
         <p className="text-red-600 mb-4">Failed to load profile data</p>
-        <Button onClick={() => queryClient.invalidateQueries(['userProfile'])}>
+        <Button onClick={() => queryClient.invalidateQueries(['auth', 'profile'])}>
           Try Again
         </Button>
       </div>
@@ -350,7 +350,7 @@ function Profile() {
               >
                 <option value="">Select District</option>
                 {districts.map((district) => (
-                  <option key={district.id} value={district.id}>
+                  <option key={district.id} value={district.name}>
                     {district.name}
                   </option>
                 ))}
@@ -368,7 +368,7 @@ function Profile() {
               >
                 <option value="">Select Upazila</option>
                 {filteredUpazilas.map((upazila) => (
-                  <option key={upazila.id} value={upazila.id}>
+                  <option key={upazila.id} value={upazila.name}>
                     {upazila.name}
                   </option>
                 ))}

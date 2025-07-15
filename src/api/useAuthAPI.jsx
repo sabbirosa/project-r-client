@@ -11,7 +11,7 @@ function useAuthAPI() {
       queryKey: ["auth", "profile"],
       queryFn: async () => {
         const response = await axiosSecure.get("/auth/profile");
-        return response.data;
+        return response.data.user; // Return the user data, not the full response
       },
     });
   };

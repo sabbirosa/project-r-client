@@ -6,9 +6,8 @@ import { toast } from "react-toastify";
 import useDonationAPI from "../api/useDonationAPI";
 import { Alert, AlertDescription, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Select, Textarea } from "../components/ui";
 import {
-    convertLocationIdsToNames,
     districts,
-    getUpazilasbyDistrictId
+    getUpazilasbyDistrictName
 } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
@@ -41,30 +40,24 @@ function CreateDonationRequest() {
 
   // Handle district change and filter upazilas
   const handleDistrictChange = (e) => {
-    const districtId = e.target.value;
-    setSelectedDistrict(districtId);
-    setValue("recipientDistrict", districtId);
+    const districtName = e.target.value;
+    setSelectedDistrict(districtName);
+    setValue("recipientDistrict", districtName);
     setValue("recipientUpazila", ""); // Reset upazila when district changes
     
-    // Use the new utility function for filtering upazilas
-    const filtered = getUpazilasbyDistrictId(districtId);
+    // Use district name for filtering upazilas
+    const filtered = getUpazilasbyDistrictName(districtName);
     setFilteredUpazilas(filtered);
   };
 
   // Handle form submission
   const onSubmit = (data) => {
-    // Use the new utility function to convert IDs to names
-    const { districtName, upazilaName } = convertLocationIdsToNames(
-      data.recipientDistrict, 
-      data.recipientUpazila
-    );
-
     const requestData = {
       requesterName: data.requesterName,
       requesterEmail: data.requesterEmail,
       recipientName: data.recipientName,
-      recipientDistrict: districtName,
-      recipientUpazila: upazilaName,
+      recipientDistrict: data.recipientDistrict,
+      recipientUpazila: data.recipientUpazila,
       hospitalName: data.hospitalName,
       fullAddress: data.fullAddress,
       bloodGroup: data.bloodGroup,
@@ -186,7 +179,7 @@ function CreateDonationRequest() {
                 >
                   <option value="">Select District</option>
                   {districts.map((district) => (
-                    <option key={district.id} value={district.id}>
+                    <option key={district.id} value={district.name}>
                       {district.name}
                     </option>
                   ))}
@@ -208,7 +201,7 @@ function CreateDonationRequest() {
                 >
                   <option value="">Select Upazila</option>
                   {filteredUpazilas.map((upazila) => (
-                    <option key={upazila.id} value={upazila.id}>
+                    <option key={upazila.id} value={upazila.name}>
                       {upazila.name}
                     </option>
                   ))}

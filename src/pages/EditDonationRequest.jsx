@@ -6,10 +6,8 @@ import { toast } from "react-toastify";
 import useDonationAPI from "../api/useDonationAPI";
 import { Alert, AlertDescription, Button, Card, CardContent, CardHeader, CardTitle, Input, LoadingSpinner, Select, Textarea } from "../components/ui";
 import {
-    convertLocationIdsToNames,
-    convertLocationNamesToIds,
     districts,
-    getUpazilasbyDistrictId
+    getUpazilasbyDistrictName
 } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
@@ -48,19 +46,13 @@ function EditDonationRequest() {
     if (requestData) {
       const request = requestData.request || requestData;
       
-      // Use utility function to convert names to IDs
-      const { districtId, upazilaId } = convertLocationNamesToIds(
-        request.recipientDistrict,
-        request.recipientUpazila
-      );
-      
-      // Set form values
+      // Set form values directly with names (since database stores names)
       reset({
         requesterName: request.requesterName,
         requesterEmail: request.requesterEmail,
         recipientName: request.recipientName,
-        recipientDistrict: districtId,
-        recipientUpazila: upazilaId,
+        recipientDistrict: request.recipientDistrict,
+        recipientUpazila: request.recipientUpazila,
         hospitalName: request.hospitalName,
         fullAddress: request.fullAddress,
         bloodGroup: request.bloodGroup,
@@ -69,10 +61,10 @@ function EditDonationRequest() {
         requestMessage: request.requestMessage,
       });
 
-      // Set district and filter upazilas using utility function
-      if (districtId) {
-        setSelectedDistrict(districtId);
-        const filtered = getUpazilasbyDistrictId(districtId);
+      // Set district and filter upazilas using district name
+      if (request.recipientDistrict) {
+        setSelectedDistrict(request.recipientDistrict);
+        const filtered = getUpazilasbyDistrictName(request.recipientDistrict);
         setFilteredUpazilas(filtered);
       }
     }
@@ -80,13 +72,13 @@ function EditDonationRequest() {
 
   // Handle district change and filter upazilas
   const handleDistrictChange = (e) => {
-    const districtId = e.target.value;
-    setSelectedDistrict(districtId);
-    setValue("recipientDistrict", districtId);
+    const districtName = e.target.value;
+    setSelectedDistrict(districtName);
+    setValue("recipientDistrict", districtName);
     setValue("recipientUpazila", ""); // Reset upazila when district changes
     
-    // Use the new utility function for filtering upazilas
-    const filtered = getUpazilasbyDistrictId(districtId);
+    // Use district name for filtering upazilas
+    const filtered = getUpazilasbyDistrictName(districtName);
     setFilteredUpazilas(filtered);
   };
 
@@ -95,18 +87,12 @@ function EditDonationRequest() {
   const { mutate: updateRequestMutation, isPending: isSubmitting } = useUpdateRequest();
 
   const onSubmit = (data) => {
-    // Use the new utility function to convert IDs to names
-    const { districtName, upazilaName } = convertLocationIdsToNames(
-      data.recipientDistrict,
-      data.recipientUpazila
-    );
-
     const requestData = {
       requesterName: data.requesterName,
       requesterEmail: data.requesterEmail,
       recipientName: data.recipientName,
-      recipientDistrict: districtName,
-      recipientUpazila: upazilaName,
+      recipientDistrict: data.recipientDistrict,
+      recipientUpazila: data.recipientUpazila,
       hospitalName: data.hospitalName,
       fullAddress: data.fullAddress,
       bloodGroup: data.bloodGroup,
@@ -262,7 +248,7 @@ function EditDonationRequest() {
                 >
                   <option value="">Select District</option>
                   {districts.map((district) => (
-                    <option key={district.id} value={district.id}>
+                    <option key={district.id} value={district.name}>
                       {district.name}
                     </option>
                   ))}
@@ -284,7 +270,7 @@ function EditDonationRequest() {
                 >
                   <option value="">Select Upazila</option>
                   {filteredUpazilas.map((upazila) => (
-                    <option key={upazila.id} value={upazila.id}>
+                    <option key={upazila.id} value={upazila.name}>
                       {upazila.name}
                     </option>
                   ))}
