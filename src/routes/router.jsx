@@ -98,29 +98,25 @@ const router = createBrowserRouter([
       // Donor routes
       {
         path: "my-donation-requests",
-        element: <MyDonationRequests />,
+        element: <MyDonationRequests />
       },
       {
         path: "create-donation-request",
-        element: <CreateDonationRequest />,
+        element: <CreateDonationRequest />
       },
       {
         path: "edit-donation-request/:id",
-        element: <EditDonationRequest />,
+        element: <EditDonationRequest />
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: <Profile />
       },
       
       // Admin/Volunteer routes
       {
         path: "all-blood-donation-request",
-        element: (
-          <PrivateRoute>
-            <AllBloodDonationRequests />
-          </PrivateRoute>
-        )
+        element: <AllBloodDonationRequests />
       },
       {
         path: "content-management",

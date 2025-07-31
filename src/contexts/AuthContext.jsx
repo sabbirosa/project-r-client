@@ -23,13 +23,21 @@ export const AuthProvider = ({ children }) => {
     
     if (savedUser && savedToken) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        console.log('AuthContext: Restoring user from localStorage:', {
+          userId: parsedUser._id || parsedUser.id,
+          role: parsedUser.role,
+          status: parsedUser.status
+        });
+        setUser(parsedUser);
         setToken(savedToken);
       } catch (error) {
         console.error("Error parsing saved user data:", error);
         localStorage.removeItem("bloodDonation_user");
         localStorage.removeItem("bloodDonation_token");
       }
+    } else {
+      console.log('AuthContext: No saved user/token found in localStorage');
     }
     setLoading(false);
   }, []);
@@ -211,7 +219,15 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is authenticated
   const isAuthenticated = () => {
-    return !!(user && token);
+    const authenticated = !!(user && token);
+    console.log('AuthContext.isAuthenticated():', { 
+      authenticated, 
+      hasUser: !!user, 
+      hasToken: !!token,
+      userRole: user?.role,
+      userStatus: user?.status
+    });
+    return authenticated;
   };
 
   // Check if user has specific role

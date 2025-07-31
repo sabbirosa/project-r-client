@@ -6,8 +6,19 @@ const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => 
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
+  // Debug logging
+  console.log('PrivateRoute check:', {
+    path: location.pathname,
+    isAuthenticated: isAuthenticated(),
+    user: user ? { role: user.role, status: user.status, id: user._id || user.id } : null,
+    loading,
+    requiredRole,
+    requiredRoles
+  });
+
   // Show loading spinner while checking authentication
   if (loading) {
+    console.log('PrivateRoute: Showing loading spinner');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading..." />
@@ -17,6 +28,7 @@ const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => 
 
   // Redirect to login if not authenticated
   if (!isAuthenticated()) {
+    console.log('PrivateRoute: Not authenticated, redirecting to login');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -34,6 +46,7 @@ const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => 
   };
 
   if ((requiredRole || requiredRoles.length > 0) && !hasRequiredRole()) {
+    console.log('PrivateRoute: User lacks required role/permissions, redirecting to dashboard');
     // If user doesn't have required role, redirect based on their actual role
     if (user?.role === 'admin') {
       return <Navigate to="/dashboard" replace />;
@@ -46,6 +59,7 @@ const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => 
 
   // Check if user is blocked
   if (user?.status === 'blocked') {
+    console.log('PrivateRoute: User is blocked, showing blocked screen');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
@@ -60,8 +74,8 @@ const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => 
           </p>
           <button
             onClick={() => {
-              localStorage.removeItem('token');
-              localStorage.removeItem('user');
+              localStorage.removeItem('bloodDonation_token');
+              localStorage.removeItem('bloodDonation_user');
               window.location.href = '/login';
             }}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors"
@@ -73,6 +87,7 @@ const PrivateRoute = ({ children, requiredRole = null, requiredRoles = [] }) => 
     );
   }
 
+  console.log('PrivateRoute: Access granted, rendering children');
   return children;
 };
 

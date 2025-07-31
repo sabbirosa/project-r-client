@@ -9,6 +9,7 @@ import useFundingAPI from "../api/useFundingAPI";
 import DonationAnalytics from "../components/charts/DonationAnalytics";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
+import { getAuthRetryConfig } from "../utils/errorHandling";
 
 // Animation variants
 const fadeInUp = {
@@ -41,35 +42,32 @@ function Dashboard() {
   const adminQueries = useAdminAPI();
   const donationMutations = useDonationAPI();
 
+  // Common retry logic for authentication errors
+  const authRetryConfig = getAuthRetryConfig();
+
   // Fetch recent donation requests (for donors only) - conditionally enabled
-  const recentRequestsQuery = donationQueries.useGetRecentRequests(3);
+  const recentRequestsQuery = donationQueries.useGetRecentRequests(3, {
+    enabled: isDonor,
+    ...authRetryConfig
+  });
   const {
     data: recentRequests,
     isLoading: requestsLoading,
     error: requestsError,
     refetch: refetchRequests
-  } = {
-    ...recentRequestsQuery,
-    data: isDonor ? recentRequestsQuery.data : null,
-    isLoading: isDonor ? recentRequestsQuery.isLoading : false,
-    error: isDonor ? recentRequestsQuery.error : null,
-    refetch: recentRequestsQuery.refetch
-  };
+  } = recentRequestsQuery;
 
   // Fetch dashboard statistics (for admin/volunteer) - conditionally enabled
-  const dashboardStatsQuery = adminQueries.useGetDashboardStats();
+  const dashboardStatsQuery = adminQueries.useGetDashboardStats({
+    enabled: isAdminOrVolunteer,
+    ...authRetryConfig
+  });
   const {
     data: dashboardStats,
     isLoading: statsLoading,
     error: statsError,
     refetch: refetchStats
-  } = {
-    ...dashboardStatsQuery,
-    data: isAdminOrVolunteer ? dashboardStatsQuery.data : null,
-    isLoading: isAdminOrVolunteer ? dashboardStatsQuery.isLoading : false,
-    error: isAdminOrVolunteer ? dashboardStatsQuery.error : null,
-    refetch: dashboardStatsQuery.refetch
-  };
+  } = dashboardStatsQuery;
 
   // Get mutation hooks
   const { mutate: updateStatusMutation } = donationMutations.useUpdateStatus();
