@@ -109,7 +109,7 @@ function Home() {
               className="flex flex-col sm:flex-row gap-4 justify-center"
               variants={fadeInUp}
             >
-              {!isAuthenticated() ? (
+              {!isAuthenticated ? (
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

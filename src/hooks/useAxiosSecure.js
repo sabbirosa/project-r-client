@@ -6,18 +6,22 @@ const axiosSecure = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: false, // Use Authorization headers instead of cookies
 });
 
 function useAxiosSecure() {
-  const { token, logout, updateUserData } = useAuth();
+  const { logout, refreshUserData, getStoredToken, createAuthHeaders } = useAuth();
 
+  // Request interceptor - Add Authorization header to all requests
   axiosSecure.interceptors.request.use((config) => {
+    const token = getStoredToken();
     if (token) {
-      config.headers.authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   });
 
+  // Response interceptor - Handle authentication errors
   axiosSecure.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -25,76 +29,66 @@ function useAxiosSecure() {
       
       // Handle 401 Unauthorized errors
       if (error.response?.status === 401) {
-        console.error("Unauthorized access - token may be expired");
+        console.error("Unauthorized access - token may be expired or invalid");
         
-        // Only auto-logout for auth-related endpoints, not for image uploads or other operations
+        // Check if this is an auth endpoint to avoid infinite loops
         const isAuthEndpoint = error.config?.url?.includes('/auth/');
-        const isProfileEndpoint = error.config?.url?.includes('/auth/profile');
-        const isRefreshEndpoint = error.config?.url?.includes('/auth/refresh');
+        const isVerifyEndpoint = error.config?.url?.includes('/auth/verify');
         
-        if (isAuthEndpoint && !isProfileEndpoint && !isRefreshEndpoint) {
-          console.log("Authentication endpoint failed - logging out");
-          logout();
-        } else {
-          console.warn("Non-auth endpoint returned 401 - may need token refresh");
+        // For auth endpoints (except verify), just reject the error
+        if (isAuthEndpoint && !isVerifyEndpoint) {
+          console.log("Auth endpoint returned 401 - not retrying");
+          return Promise.reject(error);
+        }
+        
+        // For verify endpoint or non-auth endpoints, try to refresh user data once
+        if (!originalRequest._retry) {
+          originalRequest._retry = true;
+          console.log("Attempting to refresh user authentication");
           
-          // Try to refresh user data to get updated token/user info
-          if (updateUserData && typeof updateUserData === 'function') {
-            try {
-              const result = await updateUserData();
-              if (!result.success) {
-                console.log("User data refresh failed - logging out");
-                logout();
+          try {
+            const result = await refreshUserData();
+            if (result.success) {
+              console.log("User data refreshed successfully, retrying original request");
+              // Update the Authorization header with the (potentially) new token
+              const newToken = getStoredToken();
+              if (newToken) {
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
               }
-            } catch (refreshError) {
-              console.error("Error refreshing user data:", refreshError);
+              return axiosSecure(originalRequest);
+            } else {
+              console.log("User data refresh failed - logging out");
               logout();
             }
+          } catch (refreshError) {
+            console.error("Error refreshing user data:", refreshError);
+            logout();
           }
+        } else {
+          console.log("Already retried request - logging out");
+          logout();
         }
       }
       
       // Handle 403 Forbidden errors
       if (error.response?.status === 403) {
         const errorMessage = error.response?.data?.message || '';
-        console.error("403 Forbidden Error Details:", {
+        console.error("403 Forbidden Error:", {
           url: error.config?.url,
           method: error.config?.method,
           message: errorMessage,
-          hasAuthHeader: !!error.config?.headers?.authorization,
           timestamp: new Date().toISOString()
         });
         
-        // Check if this is a role-based access issue or a blocked account
+        // Check if this is a blocked account
         if (errorMessage.toLowerCase().includes('blocked') || 
             errorMessage.toLowerCase().includes('suspended') ||
-            errorMessage.toLowerCase().includes('administrator')) {
+            errorMessage.toLowerCase().includes('banned')) {
           console.log("Account appears to be blocked - logging out");
           logout();
-        } else if (errorMessage.toLowerCase().includes('access required') || 
-                   errorMessage.toLowerCase().includes('permission')) {
+        } else {
           console.warn("Access forbidden - user may lack required permissions for this resource");
           // Don't auto-logout for permission issues, let the UI handle it
-        } else {
-          console.warn("Unknown 403 error - could be authentication timing issue");
-          // For unknown 403 errors, try refreshing user data once
-          if (updateUserData && typeof updateUserData === 'function' && !originalRequest._retry) {
-            console.log("Attempting to refresh user data for unknown 403 error");
-            originalRequest._retry = true;
-            try {
-              const result = await updateUserData();
-              if (result.success) {
-                console.log("User data refreshed, retrying original request");
-                // Update the authorization header with potentially new token
-                if (originalRequest.headers && token) {
-                  originalRequest.headers.authorization = `Bearer ${token}`;
-                }
-                return axiosSecure(originalRequest);
-              }
-            } catch (refreshError) {
-              console.error("Failed to refresh user data:", refreshError);
-            }
-          }
         }
       }
       

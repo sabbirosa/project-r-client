@@ -51,7 +51,7 @@ function Navbar() {
                 <span>Blog</span>
               </Link>
 
-              {isAuthenticated() && (
+              {isAuthenticated && (
                 <Link
                   to="/funding"
                   className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
@@ -64,7 +64,7 @@ function Navbar() {
 
             {/* Authentication Section */}
             <div className="flex items-center space-x-4">
-              {!isAuthenticated() ? (
+              {!isAuthenticated ? (
                 /* Not Authenticated */
                 <div className="flex items-center space-x-3">
                   <Link

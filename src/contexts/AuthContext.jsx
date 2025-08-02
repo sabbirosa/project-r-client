@@ -14,32 +14,112 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem("bloodDonation_token"));
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Initialize user from localStorage on app start
-  useEffect(() => {
-    const savedUser = localStorage.getItem("bloodDonation_user");
-    const savedToken = localStorage.getItem("bloodDonation_token");
-    
-    if (savedUser && savedToken) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        console.log('AuthContext: Restoring user from localStorage:', {
-          userId: parsedUser._id || parsedUser.id,
-          role: parsedUser.role,
-          status: parsedUser.status
-        });
-        setUser(parsedUser);
-        setToken(savedToken);
-      } catch (error) {
-        console.error("Error parsing saved user data:", error);
-        localStorage.removeItem("bloodDonation_user");
-        localStorage.removeItem("bloodDonation_token");
-      }
+  // Get stored token
+  const getStoredToken = () => {
+    return localStorage.getItem("bloodDonation_token");
+  };
+
+  // Set token in localStorage
+  const setStoredToken = (token) => {
+    if (token) {
+      localStorage.setItem("bloodDonation_token", token);
     } else {
-      console.log('AuthContext: No saved user/token found in localStorage');
+      localStorage.removeItem("bloodDonation_token");
     }
-    setLoading(false);
+  };
+
+  // Get stored user
+  const getStoredUser = () => {
+    try {
+      const savedUser = localStorage.getItem("bloodDonation_user");
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error("Error parsing stored user:", error);
+      localStorage.removeItem("bloodDonation_user");
+      return null;
+    }
+  };
+
+  // Set user in localStorage
+  const setStoredUser = (userData) => {
+    if (userData) {
+      localStorage.setItem("bloodDonation_user", JSON.stringify(userData));
+    } else {
+      localStorage.removeItem("bloodDonation_user");
+    }
+  };
+
+  // Create authenticated headers
+  const createAuthHeaders = (additionalHeaders = {}) => {
+    const token = getStoredToken();
+    const headers = {
+      "Content-Type": "application/json",
+      ...additionalHeaders,
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    return headers;
+  };
+
+  // Initialize authentication state
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
+        const token = getStoredToken();
+        const storedUser = getStoredUser();
+
+        if (!token) {
+          console.log('AuthContext: No token found');
+          setUser(null);
+          setIsAuthenticated(false);
+          return;
+        }
+
+        if (storedUser) {
+          // Restore user from localStorage temporarily
+          setUser(storedUser);
+          setIsAuthenticated(true);
+        }
+
+        // Verify token with server
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify`, {
+          method: "GET",
+          headers: createAuthHeaders(),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('AuthContext: Token verified, user authenticated');
+          setUser(data.user);
+          setIsAuthenticated(true);
+          setStoredUser(data.user); // Update stored user with fresh data
+        } else {
+          console.log('AuthContext: Token verification failed');
+          // Clear invalid token and user data
+          setStoredToken(null);
+          setStoredUser(null);
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+        // Don't clear on network errors, keep existing session
+        if (!getStoredToken()) {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   // Login function
@@ -62,12 +142,13 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
       
-      // Save user and token
+      // Store token and user data
+      setStoredToken(data.token);
+      setStoredUser(data.user);
       setUser(data.user);
-      setToken(data.token);
-      localStorage.setItem("bloodDonation_user", JSON.stringify(data.user));
-      localStorage.setItem("bloodDonation_token", data.token);
+      setIsAuthenticated(true);
       
+      console.log('AuthContext: Login successful');
       toast.success("Login successful!");
       return { success: true, user: data.user };
     } catch (error) {
@@ -99,12 +180,13 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
       
-      // Auto-login after successful registration
+      // Store token and user data (auto-login after registration)
+      setStoredToken(data.token);
+      setStoredUser(data.user);
       setUser(data.user);
-      setToken(data.token);
-      localStorage.setItem("bloodDonation_user", JSON.stringify(data.user));
-      localStorage.setItem("bloodDonation_token", data.token);
+      setIsAuthenticated(true);
       
+      console.log('AuthContext: Registration and auto-login successful');
       toast.success("Registration successful!");
       return { success: true, user: data.user };
     } catch (error) {
@@ -117,12 +199,65 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("bloodDonation_user");
-    localStorage.removeItem("bloodDonation_token");
-    toast.success("Logged out successfully!");
+  const logout = async () => {
+    try {
+      // Call logout endpoint to inform server (optional, doesn't affect client logout)
+      const token = getStoredToken();
+      if (token) {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+          method: "POST",
+          headers: createAuthHeaders(),
+        }).catch(error => {
+          console.warn("Server logout failed:", error);
+          // Continue with client logout anyway
+        });
+      }
+    } catch (error) {
+      console.warn("Logout error:", error);
+    } finally {
+      // Clear client-side state regardless of server response
+      setStoredToken(null);
+      setStoredUser(null);
+      setUser(null);
+      setIsAuthenticated(false);
+      console.log('AuthContext: User logged out');
+      toast.success("Logged out successfully!");
+    }
+  };
+
+  // Refresh user data from server
+  const refreshUserData = async () => {
+    try {
+      const token = getStoredToken();
+      if (!token) {
+        return { success: false, error: "No token available" };
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify`, {
+        method: "GET",
+        headers: createAuthHeaders(),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        setStoredUser(data.user);
+        setIsAuthenticated(true);
+        console.log('AuthContext: User data refreshed');
+        return { success: true, user: data.user };
+      } else {
+        // Token is invalid, clear auth state
+        console.log('AuthContext: Token invalid during refresh');
+        setStoredToken(null);
+        setStoredUser(null);
+        setUser(null);
+        setIsAuthenticated(false);
+        return { success: false, error: "Authentication expired" };
+      }
+    } catch (error) {
+      console.error("Refresh user data error:", error);
+      return { success: false, error: error.message };
+    }
   };
 
   // Update user profile
@@ -132,10 +267,7 @@ export const AuthProvider = ({ children }) => {
       
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: createAuthHeaders(),
         body: JSON.stringify(updatedData),
       });
 
@@ -146,10 +278,11 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
       
-      // Update user state
+      // Update user state and storage
       setUser(data.user);
-      localStorage.setItem("bloodDonation_user", JSON.stringify(data.user));
+      setStoredUser(data.user);
       
+      console.log('AuthContext: Profile updated successfully');
       toast.success("Profile updated successfully!");
       return { success: true, user: data.user };
     } catch (error) {
@@ -161,36 +294,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fetch and update user data from server
-  const updateUserData = async () => {
+  // Get current user data from server
+  const getCurrentUser = async () => {
     try {
+      const token = getStoredToken();
       if (!token) {
-        console.warn("No authentication token available for updateUserData");
         return { success: false, error: "No authentication token available" };
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
         method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: createAuthHeaders(),
       });
 
       if (!response.ok) {
-        // Don't clear user data on network errors or server errors
+        // Handle different error scenarios
         if (response.status >= 500) {
-          console.error("Server error during updateUserData:", response.status);
+          console.error("Server error during getCurrentUser:", response.status);
           return { success: false, error: "Server error - keeping existing user data" };
         }
         
-        // Only clear user data on authentication errors (401/403)
+        // Clear auth on authentication errors
         if (response.status === 401 || response.status === 403) {
-          console.warn("Authentication failed during updateUserData - clearing session");
+          console.warn("Authentication failed during getCurrentUser - clearing session");
+          setStoredToken(null);
+          setStoredUser(null);
           setUser(null);
-          setToken(null);
-          localStorage.removeItem("bloodDonation_user");
-          localStorage.removeItem("bloodDonation_token");
+          setIsAuthenticated(false);
           return { success: false, error: "Authentication failed" };
         }
         
@@ -203,31 +333,19 @@ export const AuthProvider = ({ children }) => {
       // Only update if we got valid user data
       if (data && (data._id || data.id)) {
         setUser(data);
-        localStorage.setItem("bloodDonation_user", JSON.stringify(data));
-        console.log("User data updated successfully");
+        setStoredUser(data);
+        setIsAuthenticated(true);
+        console.log("AuthContext: Current user data fetched successfully");
         return { success: true, user: data };
       } else {
         console.error("Invalid user data received:", data);
         return { success: false, error: "Invalid user data received" };
       }
     } catch (error) {
-      console.error("Update user data error:", error);
+      console.error("Get current user error:", error);
       // Don't clear user data on network/fetch errors
       return { success: false, error: error.message };
     }
-  };
-
-  // Check if user is authenticated
-  const isAuthenticated = () => {
-    const authenticated = !!(user && token);
-    console.log('AuthContext.isAuthenticated():', { 
-      authenticated, 
-      hasUser: !!user, 
-      hasToken: !!token,
-      userRole: user?.role,
-      userStatus: user?.status
-    });
-    return authenticated;
   };
 
   // Check if user has specific role
@@ -255,35 +373,36 @@ export const AuthProvider = ({ children }) => {
     return user?.status === "active";
   };
 
-  // Get authorization header for API calls
+  // Get authorization header for API calls (backward compatibility)
   const getAuthHeaders = () => {
-    return {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
+    return createAuthHeaders();
   };
 
   const value = {
     // User state
     user,
-    token,
     loading,
+    isAuthenticated,
     
     // Authentication methods
     login,
     register,
     logout,
+    refreshUserData,
     updateProfile,
-    updateUserData,
+    getCurrentUser,
+    
+    // Token management
+    getStoredToken,
+    createAuthHeaders,
     
     // Helper methods
-    isAuthenticated,
     hasRole,
     isAdmin,
     isVolunteer,
     isDonor,
     isActiveUser,
-    getAuthHeaders,
+    getAuthHeaders, // For backward compatibility
   };
 
   return (

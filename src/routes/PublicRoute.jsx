@@ -15,7 +15,7 @@ const PublicRoute = ({ children, redirectTo = "/dashboard" }) => {
   }
 
   // Redirect to dashboard if already authenticated
-  if (isAuthenticated()) {
+  if (isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
   }
 

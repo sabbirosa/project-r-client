@@ -54,15 +54,15 @@ function useAuthAPI() {
     });
   };
 
-  const useLogout = () => {
+  const useRefreshToken = () => {
     return useMutation({
       mutationFn: async () => {
-        const response = await axiosSecure.post("/auth/logout");
+        const response = await axiosSecure.post("/auth/refresh");
         return response.data;
       },
       onSuccess: () => {
-        // Clear all cached data after logout
-        queryClient.clear();
+        // Invalidate auth queries after token refresh
+        queryClient.invalidateQueries({ queryKey: ["auth"] });
       },
     });
   };
@@ -76,19 +76,6 @@ function useAuthAPI() {
       onSuccess: () => {
         // Invalidate profile query to refetch updated data
         queryClient.invalidateQueries({ queryKey: ["auth", "profile"] });
-      },
-    });
-  };
-
-  const useRefreshToken = () => {
-    return useMutation({
-      mutationFn: async () => {
-        const response = await axiosSecure.post("/auth/refresh");
-        return response.data;
-      },
-      onSuccess: () => {
-        // Invalidate auth queries after token refresh
-        queryClient.invalidateQueries({ queryKey: ["auth"] });
       },
     });
   };
@@ -109,9 +96,8 @@ function useAuthAPI() {
     // Mutation hooks
     useRegister,
     useLogin,
-    useLogout,
-    useUpdateProfile,
     useRefreshToken,
+    useUpdateProfile,
     useChangePassword,
   };
 }
