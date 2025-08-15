@@ -4,3 +4,20 @@
 .raleway-font {
   font-family: "Raleway", sans-serif;
 }
+
+/* Dark mode base styles */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Custom dark mode utility classes */
+.dark {
+  color-scheme: dark;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+}

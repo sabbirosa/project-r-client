@@ -11,22 +11,22 @@ const Badge = forwardRef(({
   const baseStyles = "inline-flex items-center rounded-full font-medium";
   
   const variants = {
-    default: "bg-gray-100 text-gray-800",
-    primary: "bg-red-100 text-red-800",
-    secondary: "bg-gray-100 text-gray-800",
-    success: "bg-green-100 text-green-800",
-    warning: "bg-yellow-100 text-yellow-800",
-    danger: "bg-red-100 text-red-800",
-    info: "bg-blue-100 text-blue-800",
+    default: "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
+    primary: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300",
+    secondary: "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
+    success: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
+    warning: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300",
+    danger: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300",
+    info: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300",
     // Status specific variants for blood donation app
-    pending: "bg-yellow-100 text-yellow-800",
-    inprogress: "bg-blue-100 text-blue-800",
-    done: "bg-green-100 text-green-800",
-    canceled: "bg-gray-100 text-gray-800",
-    active: "bg-green-100 text-green-800",
-    blocked: "bg-red-100 text-red-800",
-    draft: "bg-gray-100 text-gray-800",
-    published: "bg-green-100 text-green-800",
+    pending: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300",
+    inprogress: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300",
+    done: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
+    canceled: "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
+    active: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
+    blocked: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300",
+    draft: "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
+    published: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
   };
 
   const sizes = {

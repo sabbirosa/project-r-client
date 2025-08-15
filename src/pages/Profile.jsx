@@ -1,14 +1,29 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaCamera, FaEdit, FaSave, FaTimes, FaUpload } from "react-icons/fa";
+import { FaCamera, FaEdit, FaEnvelope, FaHandHoldingHeart, FaMapMarkerAlt, FaPhone, FaSave, FaTimes, FaTint, FaUpload, FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
 import useAuthAPI from "../api/useAuthAPI";
+import useDonationAPI from "../api/useDonationAPI";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, Select } from "../components/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, CloudinaryImage, Input, Select } from "../components/ui";
 import { districts, getUpazilasbyDistrictName } from "../constants/bdLocations";
 import { bloodGroups } from "../constants/bloodGroups";
 import { useAuth } from "../contexts/AuthContext";
+
+// Animation variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const scaleIn = {
+  initial: { opacity: 0, scale: 0.8 },
+  animate: { opacity: 1, scale: 1 },
+  transition: { duration: 0.5 }
+};
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -21,6 +36,7 @@ function Profile() {
   const { user, updateUserData } = useAuth();
   const authAPI = useAuthAPI();
   const publicAPI = usePublicAPI();
+  const donationAPI = useDonationAPI();
   const queryClient = useQueryClient();
 
   const {
@@ -39,6 +55,13 @@ function Profile() {
     isLoading,
     error
   } = useGetProfile();
+
+  // Fetch user donation statistics
+  const { useGetMyStats } = useDonationAPI();
+  const {
+    data: userStats,
+    isLoading: statsLoading
+  } = useGetMyStats();
 
   // Watch district changes to filter upazilas
   const watchedDistrict = watch("district");
@@ -238,35 +261,45 @@ function Profile() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              My Profile
-            </CardTitle>
-            {!isEditing ? (
-              <Button onClick={handleEdit} className="flex items-center space-x-2">
-                <FaEdit className="h-4 w-4" />
-                <span>Edit</span>
-              </Button>
-            ) : (
-              <div className="flex space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="flex items-center space-x-2"
-                >
-                  <FaTimes className="h-4 w-4" />
-                  <span>Cancel</span>
-                </Button>
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Profile Header with Stats */}
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeInUp}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
+        {/* Profile Info Card */}
+        <div className="lg:col-span-2">
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                  <FaUser className="h-6 w-6 text-red-600" />
+                  <span>My Profile</span>
+                </CardTitle>
+                {!isEditing ? (
+                  <Button onClick={handleEdit} className="flex items-center space-x-2">
+                    <FaEdit className="h-4 w-4" />
+                    <span>Edit</span>
+                  </Button>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCancel}
+                      className="flex items-center space-x-2"
+                    >
+                      <FaTimes className="h-4 w-4" />
+                      <span>Cancel</span>
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </CardHeader>
+            </CardHeader>
         
-        <CardContent>
+            <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Avatar Section */}
             <div className="flex flex-col items-center space-y-4">
@@ -430,7 +463,178 @@ function Profile() {
             )}
           </form>
         </CardContent>
-      </Card>
+          </Card>
+        </div>
+
+        {/* Statistics Card */}
+        <motion.div variants={scaleIn}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                <FaTint className="h-5 w-5 text-red-600" />
+                <span>Donation Stats</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {statsLoading ? (
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                </div>
+              ) : userStats ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Total Requests</span>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      {userStats.totalRequests || 0}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Completed</span>
+                    <Badge className="bg-green-100 text-green-800">
+                      {userStats.completedRequests || 0}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">In Progress</span>
+                    <Badge className="bg-yellow-100 text-yellow-800">
+                      {userStats.inProgressRequests || 0}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Pending</span>
+                    <Badge className="bg-gray-100 text-gray-800">
+                      {userStats.pendingRequests || 0}
+                    </Badge>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 text-sm">
+                  <FaHandHoldingHeart className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <p>No donation activity yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      {/* Additional Profile Information */}
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeInUp}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {/* Contact Information */}
+        <Card className="hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+              <FaEnvelope className="h-5 w-5 text-red-600" />
+              <span>Contact Information</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <FaEnvelope className="h-4 w-4 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">{profileData?.email}</p>
+                <p className="text-xs text-gray-500">Primary email</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <FaMapMarkerAlt className="h-4 w-4 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  {profileData?.upazila}, {profileData?.district}
+                </p>
+                <p className="text-xs text-gray-500">Current location</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <FaTint className="h-4 w-4 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  {getBloodGroupLabel(profileData?.bloodGroup)}
+                </p>
+                <p className="text-xs text-gray-500">Blood group</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Information */}
+        <Card className="hover:shadow-lg transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+              <FaUser className="h-5 w-5 text-red-600" />
+              <span>Account Information</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Role</span>
+              <Badge className="bg-purple-100 text-purple-800 capitalize">
+                {user?.role}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Status</span>
+              <Badge className={`${user?.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} capitalize`}>
+                {user?.status}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Member Since</span>
+              <span className="text-sm text-gray-900">
+                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Last Updated</span>
+              <span className="text-sm text-gray-900">
+                {profileData?.updatedAt ? new Date(profileData.updatedAt).toLocaleDateString() : 'N/A'}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Emergency Contact Section */}
+      {user?.role === 'donor' && (
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={fadeInUp}
+        >
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                <FaPhone className="h-5 w-5 text-red-600" />
+                <span>Emergency Contact</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <FaHandHoldingHeart className="h-5 w-5 text-red-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-red-900 mb-1">24/7 Emergency Hotline</h4>
+                    <p className="text-red-700 text-sm mb-2">
+                      For urgent blood donation requests or medical emergencies
+                    </p>
+                    <p className="font-bold text-red-900">+880-123-456-789</p>
+                    <p className="text-xs text-red-600 mt-1">
+                      Call immediately if you receive an emergency blood request
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }

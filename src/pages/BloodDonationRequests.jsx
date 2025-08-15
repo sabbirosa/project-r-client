@@ -4,8 +4,8 @@ import { FaCalendarAlt, FaClock, FaEye, FaFilter, FaMapMarkerAlt, FaSort, FaTint
 import { Link } from "react-router";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, LoadingSpinner, Pagination, Select } from "../components/ui";
-import { bloodGroups } from "../constants/bloodGroups";
 import { districts } from "../constants/bdLocations";
+import { bloodGroups } from "../constants/bloodGroups";
 
 // Animation variants
 const fadeInUp = {
@@ -104,7 +104,12 @@ function BloodDonationRequests() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <motion.div 
+          className="text-center mb-8"
+          initial="initial"
+          animate="animate"
+          variants={fadeInUp}
+        >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Blood Donation Requests
           </h1>
@@ -113,82 +118,228 @@ function BloodDonationRequests() {
           </p>
           {total > 0 && (
             <p className="text-lg text-gray-700 mt-2">
-              {total} urgent request{total !== 1 ? 's' : ''} need{total === 1 ? 's' : ''} your help
+              {filteredAndSortedRequests.length} of {total} request{total !== 1 ? 's' : ''} shown
             </p>
           )}
-        </div>
+        </motion.div>
+
+        {/* Filters and Sorting */}
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={fadeInUp}
+        >
+          <Card className="mb-8 hover:shadow-lg transition-shadow duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <FaFilter className="h-5 w-5 text-gray-600" />
+                  <h2 className="text-lg font-semibold text-gray-900">Filter & Sort</h2>
+                </div>
+                <Button
+                  onClick={clearFilters}
+                  variant="outline"
+                  size="sm"
+                  className="text-gray-600"
+                >
+                  Clear All
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Blood Group Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Blood Group
+                  </label>
+                  <Select
+                    value={filterBloodGroup}
+                    onChange={(e) => setFilterBloodGroup(e.target.value)}
+                  >
+                    <option value="">All Blood Groups</option>
+                    {bloodGroups.map(group => (
+                      <option key={group.value} value={group.value}>
+                        {group.label}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                {/* District Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    District
+                  </label>
+                  <Select
+                    value={filterDistrict}
+                    onChange={(e) => setFilterDistrict(e.target.value)}
+                  >
+                    <option value="">All Districts</option>
+                    {districts.map(district => (
+                      <option key={district.name} value={district.name}>
+                        {district.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                {/* Sort By */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sort By
+                  </label>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <option value="date">Date</option>
+                    <option value="bloodGroup">Blood Group</option>
+                    <option value="district">District</option>
+                  </Select>
+                </div>
+
+                {/* Sort Order */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Order
+                  </label>
+                  <Select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                  >
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Quick Sort Buttons */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button
+                  onClick={() => handleSortChange('date')}
+                  variant={sortBy === 'date' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex items-center space-x-1"
+                >
+                  <FaSort className="h-3 w-3" />
+                  <span>Date {sortBy === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}</span>
+                </Button>
+                <Button
+                  onClick={() => handleSortChange('bloodGroup')}
+                  variant={sortBy === 'bloodGroup' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex items-center space-x-1"
+                >
+                  <FaTint className="h-3 w-3" />
+                  <span>Blood Group {sortBy === 'bloodGroup' && (sortOrder === 'asc' ? '↑' : '↓')}</span>
+                </Button>
+                <Button
+                  onClick={() => handleSortChange('district')}
+                  variant={sortBy === 'district' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex items-center space-x-1"
+                >
+                  <FaMapMarkerAlt className="h-3 w-3" />
+                  <span>Location {sortBy === 'district' && (sortOrder === 'asc' ? '↑' : '↓')}</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {loading ? (
           <div className="flex justify-center items-center py-16">
             <LoadingSpinner className="w-8 h-8" />
             <span className="ml-2 text-gray-600">Loading requests...</span>
           </div>
-        ) : requests.length > 0 ? (
+        ) : filteredAndSortedRequests.length > 0 ? (
           <>
             {/* Requests Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {requests.map(request => (
-                <Card key={request._id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    {/* Header with Blood Group */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="bg-red-100 p-2 rounded-full">
-                          <FaTint className="w-4 h-4 text-red-600" />
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+              initial="initial"
+              animate="animate"
+              variants={staggerContainer}
+            >
+              {filteredAndSortedRequests.map((request, index) => (
+                <motion.div
+                  key={request._id}
+                  variants={scaleIn}
+                  custom={index}
+                  whileHover={{ y: -5, shadow: "0 10px 25px rgba(0,0,0,0.1)" }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="h-full hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-6">
+                      {/* Header with Blood Group */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <motion.div 
+                            className="bg-red-100 p-2 rounded-full"
+                            whileHover={{ scale: 1.1, rotate: 360 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <FaTint className="w-4 h-4 text-red-600" />
+                          </motion.div>
+                          <span className="font-bold text-red-600 text-lg">
+                            {request.bloodGroup}
+                          </span>
                         </div>
-                        <span className="font-bold text-red-600 text-lg">
-                          {request.bloodGroup}
+                        <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                          Urgent
                         </span>
                       </div>
-                      <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        Urgent
-                      </span>
-                    </div>
 
-                    {/* Patient Name */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      For: {request.recipientName}
-                    </h3>
+                      {/* Patient Name */}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        For: {request.recipientName}
+                      </h3>
 
-                    {/* Location */}
-                    <div className="flex items-center text-gray-600 mb-2">
-                      <FaMapMarkerAlt className="w-4 h-4 mr-2" />
-                      <span className="text-sm">
-                        {request.hospitalName}, {request.recipientUpazila}, {request.recipientDistrict}
-                      </span>
-                    </div>
-
-                    {/* Date and Time */}
-                    <div className="flex items-center space-x-4 text-gray-600 mb-4">
-                      <div className="flex items-center">
-                        <FaCalendarAlt className="w-3 h-3 mr-1" />
+                      {/* Location */}
+                      <div className="flex items-center text-gray-600 mb-2">
+                        <FaMapMarkerAlt className="w-4 h-4 mr-2" />
                         <span className="text-sm">
-                          {formatDate(request.donationDate)}
+                          {request.hospitalName}, {request.recipientUpazila}, {request.recipientDistrict}
                         </span>
                       </div>
-                      <div className="flex items-center">
-                        <FaClock className="w-3 h-3 mr-1" />
-                        <span className="text-sm">
-                          {request.donationTime}
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* View Details Button */}
-                    <Button
-                      asChild
-                      className="w-full"
-                      variant="outline"
-                    >
-                      <Link to={`/donation-requests/${request._id}`} className="flex items-center justify-center space-x-2">
-                        <FaEye className="w-4 h-4" />
-                        <span>View Details</span>
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+                      {/* Date and Time */}
+                      <div className="flex items-center space-x-4 text-gray-600 mb-4">
+                        <div className="flex items-center">
+                          <FaCalendarAlt className="w-3 h-3 mr-1" />
+                          <span className="text-sm">
+                            {formatDate(request.donationDate)}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <FaClock className="w-3 h-3 mr-1" />
+                          <span className="text-sm">
+                            {request.donationTime}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* View Details Button */}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          asChild
+                          className="w-full"
+                          variant="outline"
+                        >
+                          <Link to={`/donation-requests/${request._id}`} className="flex items-center justify-center space-x-2">
+                            <FaEye className="w-4 h-4" />
+                            <span>View Details</span>
+                          </Link>
+                        </Button>
+                      </motion.div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -202,20 +353,47 @@ function BloodDonationRequests() {
             )}
           </>
         ) : (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <FaTint className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No Active Requests
-              </h3>
-              <p className="text-gray-600 mb-4">
-                There are currently no pending blood donation requests.
-              </p>
-              <p className="text-gray-500 text-sm">
-                Check back later or consider registering as a donor to be notified of new requests.
-              </p>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial="initial"
+            animate="animate"
+            variants={fadeInUp}
+          >
+            <Card className="hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-8 text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <FaTint className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                </motion.div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {rawRequests.length === 0 ? "No Active Requests" : "No Matching Requests"}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {rawRequests.length === 0 
+                    ? "There are currently no pending blood donation requests."
+                    : "No requests match your current filters. Try adjusting your search criteria."}
+                </p>
+                <div className="space-y-2">
+                  <p className="text-gray-500 text-sm">
+                    {rawRequests.length === 0 
+                      ? "Check back later or consider registering as a donor to be notified of new requests."
+                      : ""}
+                  </p>
+                  {rawRequests.length > 0 && (
+                    <Button
+                      onClick={clearFilters}
+                      variant="outline"
+                      className="mt-4"
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
         {/* Call to Action */}

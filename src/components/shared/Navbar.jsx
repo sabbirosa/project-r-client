@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { FaBars, FaChevronDown, FaDonate, FaHome, FaSignInAlt, FaSignOutAlt, FaTachometerAlt, FaTimes, FaTint, FaUser, FaUserPlus } from "react-icons/fa";
+import { FaBars, FaChevronDown, FaDonate, FaHome, FaMoon, FaSignInAlt, FaSignOutAlt, FaSun, FaTachometerAlt, FaTimes, FaTint, FaUser, FaUserPlus } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import Logo from "./Logo";
 
 function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,13 +63,13 @@ function Navbar() {
   const navigationLinks = getNavigationLinks();
 
   return (
-    <nav className="bg-white shadow-lg border-b border-red-100 sticky top-0 z-50 w-full">
+    <nav className="bg-white dark:bg-gray-900 shadow-lg border-b border-red-100 dark:border-gray-700 sticky top-0 z-50 w-full transition-colors duration-200">
       <div className="w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Logo and Brand */}
             <div className="flex items-center">
-              <Logo theme={"dark"} />
+              <Logo theme={darkMode ? "light" : "dark"} />
             </div>
 
             {/* Desktop Navigation Links */}
@@ -80,8 +82,8 @@ function Navbar() {
                     to={link.path}
                     className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors ${
                       isActiveRoute(link.path)
-                        ? "text-red-600 bg-red-50"
-                        : "text-gray-700 hover:text-red-600 hover:bg-red-50"
+                        ? "text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400"
+                        : "text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     }`}
                   >
                     {Icon && <Icon className="h-4 w-4" />}
@@ -93,19 +95,32 @@ function Navbar() {
 
             {/* Desktop Authentication Section */}
             <div className="hidden md:flex items-center space-x-4">
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? (
+                  <FaSun className="h-5 w-5" />
+                ) : (
+                  <FaMoon className="h-5 w-5" />
+                )}
+              </button>
+
               {!isAuthenticated ? (
                 /* Not Authenticated */
                 <div className="flex items-center space-x-3">
                   <Link
                     to="/login"
-                    className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
+                    className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
                   >
                     <FaSignInAlt className="h-4 w-4" />
                     <span>Login</span>
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
+                    className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-1 transition-colors"
                   >
                     <FaUserPlus className="h-4 w-4" />
                     <span>Join as Donor</span>
@@ -135,16 +150,16 @@ function Navbar() {
 
                   {/* Desktop Dropdown Menu */}
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                        <p className="text-sm text-gray-500">{user?.email}</p>
-                        <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 capitalize">{user?.role}</p>
                       </div>
                       
                       <Link
                         to="/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         <div className="flex items-center space-x-2">
@@ -155,7 +170,7 @@ function Navbar() {
                       
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                       >
                         <div className="flex items-center space-x-2">
                           <FaSignOutAlt className="h-4 w-4" />
@@ -170,11 +185,24 @@ function Navbar() {
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center space-x-2">
+              {/* Mobile Dark Mode Toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? (
+                  <FaSun className="h-5 w-5" />
+                ) : (
+                  <FaMoon className="h-5 w-5" />
+                )}
+              </button>
+
               {isAuthenticated && (
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-red-600 p-2 rounded-md transition-colors"
+                    className="flex items-center space-x-1 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-md transition-colors"
                   >
                     {user?.avatar ? (
                       <img
@@ -191,15 +219,15 @@ function Navbar() {
 
                   {/* Mobile User Dropdown */}
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                        <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-200 dark:border-gray-700">
+                      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 capitalize">{user?.role}</p>
                       </div>
                       
                       <Link
                         to="/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                         onClick={closeMobileMenu}
                       >
                         <div className="flex items-center space-x-2">
@@ -210,7 +238,7 @@ function Navbar() {
                       
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                       >
                         <div className="flex items-center space-x-2">
                           <FaSignOutAlt className="h-4 w-4" />
@@ -224,7 +252,7 @@ function Navbar() {
               
               <button
                 onClick={toggleMobileMenu}
-                className="text-gray-700 hover:text-red-600 p-2 rounded-md transition-colors"
+                className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-md transition-colors"
               >
                 {isMobileMenuOpen ? (
                   <FaTimes className="h-6 w-6" />
@@ -237,7 +265,7 @@ function Navbar() {
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4 bg-white dark:bg-gray-900">
               <div className="space-y-1">
                 {navigationLinks.map((link) => {
                   const Icon = link.icon;
@@ -248,8 +276,8 @@ function Navbar() {
                       onClick={closeMobileMenu}
                       className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                         isActiveRoute(link.path)
-                          ? "text-red-600 bg-red-50"
-                          : "text-gray-700 hover:text-red-600 hover:bg-red-50"
+                          ? "text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400"
+                          : "text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                       }`}
                     >
                       <div className="flex items-center space-x-2">
@@ -263,11 +291,11 @@ function Navbar() {
 
               {/* Mobile Authentication Links */}
               {!isAuthenticated && (
-                <div className="mt-4 pt-4 border-t border-gray-200 space-y-1">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-1">
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     <div className="flex items-center space-x-2">
                       <FaSignInAlt className="h-4 w-4" />
@@ -277,7 +305,7 @@ function Navbar() {
                   <Link
                     to="/register"
                     onClick={closeMobileMenu}
-                    className="block px-3 py-2 rounded-md text-base font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                   >
                     <div className="flex items-center space-x-2">
                       <FaUserPlus className="h-4 w-4" />
