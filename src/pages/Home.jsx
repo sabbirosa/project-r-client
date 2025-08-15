@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { FaEnvelope, FaHandHoldingHeart, FaMapMarkerAlt, FaPhone, FaSearch, FaTint, FaUserPlus, FaUsers } from "react-icons/fa";
+import { FaAward, FaCertificate, FaEnvelope, FaHandHoldingHeart, FaHeart, FaMapMarkerAlt, FaMedal, FaPhone, FaQuoteLeft, FaSearch, FaShieldAlt, FaStar, FaTint, FaUserPlus, FaUsers } from "react-icons/fa";
 import { Link } from "react-router";
 import usePublicAPI from "../api/usePublicAPI";
 import { Button, Card, CardContent, Input, Textarea } from "../components/ui";
@@ -82,9 +82,17 @@ function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Banner */}
-      <section className="bg-gradient-to-r from-red-600 to-red-800 text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      {/* Hero Banner Section */}
+      <section className="relative bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 opacity-20">
+          <img 
+            src="https://images.unsplash.com/photo-1615461066159-fea0960485d5?q=80&w=1916&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Blood donation background"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <motion.div 
             className="text-center"
             initial="initial"
