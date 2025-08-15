@@ -583,6 +583,383 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* Success Stories Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center mb-12"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Success Stories
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Real stories from people whose lives were saved through blood donation.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {/* Story 1 */}
+            <motion.div variants={scaleIn}>
+              <Card className="h-full hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face"
+                      alt="Patient"
+                      className="w-12 h-12 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Ahmed Rahman</h4>
+                      <p className="text-sm text-gray-500">Accident Victim</p>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <FaQuoteLeft className="text-red-200 text-2xl mb-2" />
+                    <p className="text-gray-600 italic">
+                      "Thanks to the quick response of blood donors, I'm alive today. The blood donation community saved my life after a severe accident."
+                    </p>
+                  </div>
+                  <div className="flex items-center text-yellow-500">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="w-4 h-4" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Story 2 */}
+            <motion.div variants={scaleIn}>
+              <Card className="h-full hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1494790108755-2616b9ixJgX9OYfE?w=64&h=64&fit=crop&crop=face"
+                      alt="Patient"
+                      className="w-12 h-12 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Sarah Khan</h4>
+                      <p className="text-sm text-gray-500">Surgery Patient</p>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <FaQuoteLeft className="text-red-200 text-2xl mb-2" />
+                    <p className="text-gray-600 italic">
+                      "During my emergency surgery, blood donors became my heroes. Their generosity gave me a second chance at life."
+                    </p>
+                  </div>
+                  <div className="flex items-center text-yellow-500">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="w-4 h-4" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Story 3 */}
+            <motion.div variants={scaleIn}>
+              <Card className="h-full hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <img 
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face"
+                      alt="Patient"
+                      className="w-12 h-12 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Dr. Karim</h4>
+                      <p className="text-sm text-gray-500">Medical Professional</p>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <FaQuoteLeft className="text-red-200 text-2xl mb-2" />
+                    <p className="text-gray-600 italic">
+                      "As a doctor, I've seen countless lives saved by blood donors. This platform makes connecting donors with patients seamless."
+                    </p>
+                  </div>
+                  <div className="flex items-center text-yellow-500">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="w-4 h-4" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Blood Types Information Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center mb-12"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Blood Types & Compatibility
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Understanding blood types helps us connect the right donors with recipients.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bloodType, index) => (
+              <motion.div key={bloodType} variants={scaleIn}>
+                <Card className="h-full hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                  <CardContent className="p-6 text-center">
+                    <motion.div 
+                      className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                      whileHover={{ scale: 1.1, rotate: 360 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <FaTint className="h-8 w-8 text-red-600" />
+                    </motion.div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{bloodType}</h3>
+                    <p className="text-sm text-gray-600">
+                      {bloodType === 'O-' ? 'Universal Donor' : 
+                       bloodType === 'AB+' ? 'Universal Recipient' : 
+                       'Compatible Types'}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Recognition & Awards Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center mb-12"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Recognition & Awards
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Our commitment to excellence in blood donation services has been recognized nationally.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {/* Award 1 */}
+            <motion.div variants={scaleIn}>
+              <Card className="text-center p-8 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1, rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <FaAward className="h-8 w-8 text-yellow-600" />
+                  </motion.div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Best Healthcare Initiative</h3>
+                  <p className="text-gray-600">Ministry of Health Bangladesh - 2023</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Award 2 */}
+            <motion.div variants={scaleIn}>
+              <Card className="text-center p-8 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1, rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <FaCertificate className="h-8 w-8 text-blue-600" />
+                  </motion.div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Digital Innovation Award</h3>
+                  <p className="text-gray-600">Bangladesh Tech Awards - 2023</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Award 3 */}
+            <motion.div variants={scaleIn}>
+              <Card className="text-center p-8 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1, rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <FaMedal className="h-8 w-8 text-green-600" />
+                  </motion.div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Community Service Excellence</h3>
+                  <p className="text-gray-600">Red Crescent Society - 2022</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Safety & Trust Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center mb-12"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Safety & Trust
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Your safety and privacy are our top priorities in every blood donation process.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {/* Safety Feature 1 */}
+            <motion.div variants={fadeInUp}>
+              <Card className="text-center p-6 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaShieldAlt className="h-6 w-6 text-red-600" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Verified Donors</h3>
+                  <p className="text-gray-600 text-sm">All donors are verified and undergo health screening</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Safety Feature 2 */}
+            <motion.div variants={fadeInUp}>
+              <Card className="text-center p-6 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaHeart className="h-6 w-6 text-red-600" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Health Monitoring</h3>
+                  <p className="text-gray-600 text-sm">Regular health checkups and monitoring for all participants</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Safety Feature 3 */}
+            <motion.div variants={fadeInUp}>
+              <Card className="text-center p-6 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaCertificate className="h-6 w-6 text-red-600" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Certified Process</h3>
+                  <p className="text-gray-600 text-sm">WHO certified blood collection and testing procedures</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Safety Feature 4 */}
+            <motion.div variants={fadeInUp}>
+              <Card className="text-center p-6 hover:shadow-lg transition-all duration-300">
+                <CardContent className="pt-6">
+                  <motion.div 
+                    className="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaUsers className="h-6 w-6 text-red-600" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Community Trust</h3>
+                  <p className="text-gray-600 text-sm">Trusted by thousands of donors and recipients nationwide</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="py-16 bg-gradient-to-r from-red-600 to-red-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ready to Save Lives?
+            </h2>
+            <p className="text-xl mb-8 max-w-2xl mx-auto text-red-100">
+              Join thousands of heroes who are making a difference in their communities every day.
+            </p>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                asChild
+                size="lg"
+                className="bg-white text-red-600 hover:bg-gray-100"
+              >
+                <Link to={isAuthenticated ? "/dashboard" : "/register"} className="flex items-center space-x-2">
+                  <FaUserPlus className="h-5 w-5" />
+                  <span>{isAuthenticated ? "Go to Dashboard" : "Start Your Journey"}</span>
+                </Link>
+              </Button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }

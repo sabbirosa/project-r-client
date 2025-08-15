@@ -1,13 +1,41 @@
+import { motion } from "framer-motion";
 import { useState } from "react";
-import { FaCalendarAlt, FaClock, FaEye, FaMapMarkerAlt, FaTint } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaEye, FaFilter, FaMapMarkerAlt, FaSort, FaTint } from "react-icons/fa";
 import { Link } from "react-router";
 import usePublicAPI from "../api/usePublicAPI";
-import { Button, Card, CardContent, LoadingSpinner, Pagination } from "../components/ui";
+import { Button, Card, CardContent, LoadingSpinner, Pagination, Select } from "../components/ui";
+import { bloodGroups } from "../constants/bloodGroups";
+import { districts } from "../constants/bdLocations";
+
+// Animation variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const scaleIn = {
+  initial: { opacity: 0, scale: 0.8 },
+  animate: { opacity: 1, scale: 1 },
+  transition: { duration: 0.5 }
+};
 
 function BloodDonationRequests() {
   const { useGetPendingDonations } = usePublicAPI();
   
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState('date'); // date, priority
+  const [sortOrder, setSortOrder] = useState('desc'); // asc, desc
+  const [filterBloodGroup, setFilterBloodGroup] = useState('');
+  const [filterDistrict, setFilterDistrict] = useState('');
 
   // Fetch pending donation requests using the hook
   const { data, isLoading: loading, isError, error } = useGetPendingDonations({ 
@@ -15,13 +43,52 @@ function BloodDonationRequests() {
     limit: 12 
   });
 
-  const requests = data?.requests || [];
+  const rawRequests = data?.requests || [];
   const totalPages = data?.totalPages || 1;
   const total = data?.total || 0;
+
+  // Apply filters and sorting
+  const filteredAndSortedRequests = rawRequests
+    .filter(request => {
+      if (filterBloodGroup && request.bloodGroup !== filterBloodGroup) return false;
+      if (filterDistrict && request.recipientDistrict !== filterDistrict) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      let compareValue = 0;
+      
+      if (sortBy === 'date') {
+        compareValue = new Date(a.donationDate) - new Date(b.donationDate);
+      } else if (sortBy === 'bloodGroup') {
+        compareValue = a.bloodGroup.localeCompare(b.bloodGroup);
+      } else if (sortBy === 'district') {
+        compareValue = a.recipientDistrict.localeCompare(b.recipientDistrict);
+      }
+      
+      return sortOrder === 'asc' ? compareValue : -compareValue;
+    });
 
   // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  // Handle sort change
+  const handleSortChange = (newSortBy) => {
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(newSortBy);
+      setSortOrder('desc');
+    }
+  };
+
+  // Clear filters
+  const clearFilters = () => {
+    setFilterBloodGroup('');
+    setFilterDistrict('');
+    setSortBy('date');
+    setSortOrder('desc');
   };
 
   // Format date and time
