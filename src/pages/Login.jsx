@@ -26,16 +26,16 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-red-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-red-100">
-            <FaUser className="h-6 w-6 text-red-600" />
+          <div className="mx-auto h-14 w-14 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-950/30 shadow-lg">
+            <FaUser className="h-7 w-7 text-red-600 dark:text-red-400" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
             Welcome Back
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
             Sign in to your blood donor account
           </p>
         </div>
@@ -64,8 +64,8 @@ function Login() {
 
               {/* Password */}
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  Password <span className="text-red-500 ml-1">*</span>
+                <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                  Password <span className="text-red-600 dark:text-red-400 ml-1">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -73,23 +73,23 @@ function Login() {
                       required: "Password is required"
                     })}
                     type={showPassword ? "text" : "password"}
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+                    className="flex h-10 w-full rounded-md border px-3 py-2 text-sm font-medium bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:border-red-600 dark:focus:border-red-500 hover:border-gray-400 dark:hover:border-gray-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-800 transition-all duration-200 ease-in-out pr-10"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <FaEyeSlash className="h-4 w-4 text-gray-400" />
+                      <FaEyeSlash className="h-4 w-4" />
                     ) : (
-                      <FaEye className="h-4 w-4 text-gray-400" />
+                      <FaEye className="h-4 w-4" />
                     )}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-red-600">{errors.password.message}</p>
+                  <p className="text-sm font-medium text-red-600 dark:text-red-400 mt-1">{errors.password.message}</p>
                 )}
               </div>
 
@@ -103,11 +103,11 @@ function Login() {
               </Button>
 
               <div className="text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Don't have an account?{" "}
                   <Link
                     to="/register"
-                    className="font-medium text-red-600 hover:text-red-500"
+                    className="font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200"
                   >
                     Register here
                   </Link>

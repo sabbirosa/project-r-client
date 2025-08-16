@@ -8,11 +8,11 @@ const Alert = forwardRef(({
   ...props 
 }, ref) => {
   const variants = {
-    default: "bg-gray-50 text-gray-900 border-gray-200",
-    destructive: "bg-red-50 text-red-900 border-red-200",
-    success: "bg-green-50 text-green-900 border-green-200",
-    warning: "bg-yellow-50 text-yellow-900 border-yellow-200",
-    info: "bg-blue-50 text-blue-900 border-b border-gray-200lue-200",
+    default: "bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600",
+    destructive: "bg-red-50 dark:bg-red-950/30 text-red-900 dark:text-red-100 border-red-300 dark:border-red-700",
+    success: "bg-green-50 dark:bg-green-950/30 text-green-900 dark:text-green-100 border-green-300 dark:border-green-700",
+    warning: "bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-100 border-amber-300 dark:border-amber-700",
+    info: "bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-700",
   };
 
   return (
@@ -20,7 +20,7 @@ const Alert = forwardRef(({
       ref={ref}
       role="alert"
       className={cn(
-        "relative w-full rounded-lg border p-4",
+        "relative w-full rounded-lg border p-4 font-medium transition-all duration-200 ease-in-out",
         variants[variant],
         className
       )}
@@ -34,7 +34,7 @@ const Alert = forwardRef(({
 const AlertTitle = forwardRef(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    className={cn("mb-2 font-semibold leading-none tracking-tight text-current", className)}
     {...props}
   />
 ));
@@ -42,7 +42,7 @@ const AlertTitle = forwardRef(({ className, ...props }, ref) => (
 const AlertDescription = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("text-sm font-normal opacity-90 [&_p]:leading-relaxed", className)}
     {...props}
   />
 ));

@@ -5,7 +5,10 @@ const Card = forwardRef(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm",
+      "rounded-xl border border-gray-200 dark:border-gray-700",
+      "bg-white dark:bg-gray-900",
+      "shadow-sm hover:shadow-md transition-all duration-200",
+      "overflow-hidden",
       className
     )}
     {...props}
@@ -17,7 +20,12 @@ const Card = forwardRef(({ className, children, ...props }, ref) => (
 const CardHeader = forwardRef(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn(
+      "flex flex-col space-y-2 p-6",
+      "border-b border-gray-200 dark:border-gray-700",
+      "bg-gray-50 dark:bg-gray-800/50",
+      className
+    )}
     {...props}
   >
     {children}
@@ -27,7 +35,11 @@ const CardHeader = forwardRef(({ className, children, ...props }, ref) => (
 const CardTitle = forwardRef(({ className, children, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-lg font-semibold leading-none tracking-tight text-gray-900 dark:text-gray-100", className)}
+    className={cn(
+      "text-xl font-bold leading-none tracking-tight",
+      "text-gray-900 dark:text-gray-100",
+      className
+    )}
     {...props}
   >
     {children}
@@ -37,7 +49,10 @@ const CardTitle = forwardRef(({ className, children, ...props }, ref) => (
 const CardDescription = forwardRef(({ className, children, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-500 dark:text-gray-400", className)}
+    className={cn(
+      "text-sm font-medium text-gray-600 dark:text-gray-400",
+      className
+    )}
     {...props}
   >
     {children}
@@ -47,7 +62,7 @@ const CardDescription = forwardRef(({ className, children, ...props }, ref) => (
 const CardContent = forwardRef(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("p-6", className)}
+    className={cn("p-6 text-gray-900 dark:text-gray-100", className)}
     {...props}
   >
     {children}
@@ -57,7 +72,12 @@ const CardContent = forwardRef(({ className, children, ...props }, ref) => (
 const CardFooter = forwardRef(({ className, children, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn(
+      "flex items-center justify-between p-6 pt-0",
+      "border-t border-gray-200 dark:border-gray-700",
+      "bg-gray-50 dark:bg-gray-800/50",
+      className
+    )}
     {...props}
   >
     {children}

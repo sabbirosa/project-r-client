@@ -123,7 +123,7 @@ function PaymentForm({ amount, onSuccess, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Donation Amount
         </label>
         <div className="text-2xl font-bold text-green-600 mb-4">
@@ -132,7 +132,7 @@ function PaymentForm({ amount, onSuccess, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Card Information
         </label>
         <div className="border border-gray-300 rounded-md p-4 bg-white">
@@ -285,7 +285,7 @@ function Funding() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -310,8 +310,8 @@ function Funding() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
 
         {/* Statistics Cards */}
-        <section className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Our Impact Together</h2>
+        <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-8">Our Impact Together</h2>
           {fundingStats && !statsLoading && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Total Funding */}
@@ -372,9 +372,9 @@ function Funding() {
         </section>
 
         {/* Recent Donations Section */}
-        <section className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Recent Donations</h2>
-          <p className="text-gray-600 text-center mb-8">Thank you to our generous supporters</p>
+        <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-8">Recent Donations</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-center mb-8">Thank you to our generous supporters</p>
           
           <div>
           {isLoading ? (
@@ -478,7 +478,7 @@ function Funding() {
             // Amount selection form
             <form onSubmit={handleSubmit(onDonationSubmit)} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Donation Amount ($)
                 </label>
                 <Input
@@ -537,11 +537,11 @@ function Funding() {
               </Elements>
             ) : (
               <div className="text-center py-8">
-                <FaCreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <FaCreditCard className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                   Payment Not Available
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Payment processing is not configured. Please contact support.
                 </p>
                 <Button onClick={() => setShowDonateModal(false)}>

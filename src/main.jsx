@@ -27,15 +27,18 @@ createRoot(document.getElementById('root')).render(
           <RouterProvider router={router} />
           <ToastContainer
             position="top-right"
-            autoClose={3000}
+            autoClose={4000}
             hideProgressBar={false}
-            newestOnTop={false}
+            newestOnTop
             closeOnClick
             rtl={false}
             pauseOnFocusLoss
             draggable
             pauseOnHover
             theme="colored"
+            toastClassName="!bg-white dark:!bg-gray-800 !text-gray-900 dark:!text-gray-100 !shadow-lg !border !border-gray-200 dark:!border-gray-700"
+            bodyClassName="!text-gray-900 dark:!text-gray-100 !font-medium"
+            progressClassName="!bg-red-500 dark:!bg-red-400"
           />
         </AuthProvider>
       </ThemeProvider>

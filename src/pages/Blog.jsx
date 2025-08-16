@@ -39,14 +39,14 @@ function Blog() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Blood Donation Blog
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Stay informed with the latest news, stories, and insights about blood donation and its impact on saving lives.
           </p>
         </div>
@@ -57,7 +57,7 @@ function Blog() {
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
               <div className="flex gap-4">
                 <div className="flex-1 relative">
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                   <Input
                     type="text"
                     placeholder="Search blogs by title or content..."
@@ -88,10 +88,10 @@ function Blog() {
               <div className="text-red-500 mb-4">
                 <FaSearch className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Failed to Load Blogs
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 {error?.message || "Unable to fetch blogs. Please try again."}
               </p>
               <Button onClick={() => window.location.reload()}>
@@ -105,13 +105,13 @@ function Blog() {
         {!isLoading && !isError && data?.blogs?.length === 0 && (
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
-              <div className="text-gray-400 mb-4">
+              <div className="text-gray-400 dark:text-gray-600 mb-4">
                 <FaSearch className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 No Blogs Found
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 {searchQuery 
                   ? `No blogs match your search "${searchQuery}"`
                   : "No published blogs available at the moment"
@@ -154,7 +154,7 @@ function Blog() {
                 </div>
                 
                 <CardContent className="p-6">
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+                  <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
                     <div className="flex items-center space-x-1">
                       <FaUser className="h-3 w-3" />
                       <span>{blog.authorName || "Admin"}</span>
@@ -165,11 +165,11 @@ function Blog() {
                     </div>
                   </div>
                   
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 line-clamp-2">
                     {blog.title}
                   </h3>
                   
-                  <p className="text-gray-600 mb-4 text-sm line-clamp-3">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm line-clamp-3">
                     {truncateContent(blog.content)}
                   </p>
                   
@@ -181,7 +181,7 @@ function Blog() {
                       </Link>
                     </Button>
                     
-                    <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded-full">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
                       {blog.status}
                     </span>
                   </div>
@@ -204,7 +204,7 @@ function Blog() {
 
         {/* Results Info */}
         {!isLoading && !isError && data?.total > 0 && (
-          <div className="text-center mt-8 text-gray-600">
+          <div className="text-center mt-8 text-gray-600 dark:text-gray-400">
             <p>
               Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, data.total)} of {data.total} blogs
               {searchQuery && ` for "${searchQuery}"`}

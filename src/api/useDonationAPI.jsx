@@ -57,6 +57,16 @@ function useDonationAPI() {
     });
   };
 
+  const useGetMyStats = () => {
+    return useQuery({
+      queryKey: ["donations", "my-stats"],
+      queryFn: async () => {
+        const response = await axiosSecure.get("/donations/my-stats");
+        return response.data;
+      },
+    });
+  };
+
   const useSearchRequests = (filters) => {
     return useQuery({
       queryKey: ["donations", "search", filters],
@@ -150,6 +160,7 @@ function useDonationAPI() {
     useGetRecentRequests,
     useGetRequestById,
     useGetStats,
+    useGetMyStats,
     useSearchRequests,
     // Mutation hooks
     useCreateRequest,

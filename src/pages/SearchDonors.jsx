@@ -149,7 +149,7 @@ function SearchDonors() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div 
@@ -158,10 +158,10 @@ function SearchDonors() {
           animate="animate"
           variants={fadeInUp}
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Search Blood Donors
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Find blood donors in your area. Search by blood group and location to connect with donors.
           </p>
         </motion.div>
@@ -181,7 +181,7 @@ function SearchDonors() {
                     whileFocus={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Blood Group
                     </label>
                     <Select
@@ -202,7 +202,7 @@ function SearchDonors() {
                     whileFocus={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       District
                     </label>
                     <Select
@@ -225,7 +225,7 @@ function SearchDonors() {
                     whileFocus={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Upazila
                     </label>
                     <Select
@@ -281,11 +281,11 @@ function SearchDonors() {
             variants={fadeInUp}
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 Search Results
               </h2>
               <div className="flex items-center space-x-4">
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-400">
                   {donors.length} donor{donors.length !== 1 ? 's' : ''} found
                 </span>
                 {donors.length > 0 && (
@@ -353,7 +353,7 @@ function SearchDonors() {
                               </motion.div>
                             )}
                             <div>
-                              <h3 className="font-semibold text-gray-900">{donor.name}</h3>
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{donor.name}</h3>
                               <div className="flex items-center text-red-600 text-sm">
                                 <FaTint className="w-3 h-3 mr-1" />
                                 {donor.bloodGroup}
@@ -361,7 +361,7 @@ function SearchDonors() {
                             </div>
                           </div>
                           
-                          <div className="flex items-center text-gray-600 text-sm">
+                          <div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
                             <FaMapMarkerAlt className="w-3 h-3 mr-1" />
                             {donor.upazila}, {donor.district}
                           </div>
@@ -379,12 +379,12 @@ function SearchDonors() {
                         animate={{ scale: 1 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <FaSearch className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <FaSearch className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                       </motion.div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         No Donors Found
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-gray-600 dark:text-gray-400">
                         No donors found matching your criteria. Try adjusting your search parameters.
                       </p>
                     </CardContent>
@@ -409,12 +409,12 @@ function SearchDonors() {
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <FaSearch className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <FaSearch className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 </motion.div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Ready to Search
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Fill in the search form above to find blood donors in your area.
                 </p>
               </CardContent>

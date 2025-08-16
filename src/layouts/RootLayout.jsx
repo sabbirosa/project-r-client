@@ -4,12 +4,12 @@ import Navbar from "../components/shared/Navbar";
 
 function RootLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-all duration-200 overflow-x-hidden">
       {/* Navigation Bar */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 w-full bg-white dark:bg-gray-900">
         <Outlet />
       </main>
 
