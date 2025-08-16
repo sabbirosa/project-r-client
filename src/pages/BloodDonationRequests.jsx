@@ -36,7 +36,7 @@ function BloodDonationRequests() {
   // Single sorting control: "<field>_<order>"
   // fields: date | bloodGroup | district
   // orders: asc | desc
-  const [sortOption, setSortOption] = useState<"date_desc" | "date_asc" | "bloodGroup_asc" | "bloodGroup_desc" | "district_asc" | "district_desc">("date_desc");
+  const [sortOption, setSortOption] = useState("date_desc");
 
   const [filterBloodGroup, setFilterBloodGroup] = useState("");
   const [filterDistrict, setFilterDistrict] = useState("");

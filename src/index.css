@@ -1,68 +1,66 @@
 @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 
+/* Configure dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Define custom theme variables using Tailwind v4 syntax */
+@theme {
+  /* Brand colors */
+  --color-brand-primary: oklch(0.15 0.02 258);
+  --color-brand-red: oklch(0.64 0.24 25);
+  --color-brand-red-light: oklch(0.94 0.093 25);
+  --color-brand-red-dark: oklch(0.31 0.16 25);
+  
+  /* Semantic colors for light mode */
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.15 0.02 258);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.15 0.02 258);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.15 0.02 258);
+  --color-muted: oklch(0.96 0.01 258);
+  --color-muted-foreground: oklch(0.46 0.01 258);
+  --color-border: oklch(0.91 0.01 258);
+  --color-input: oklch(0.91 0.01 258);
+  --color-ring: oklch(0.64 0.24 25);
+  
+  /* Status colors */
+  --color-success: oklch(0.36 0.12 142);
+  --color-success-foreground: oklch(0.98 0 0);
+  --color-warning: oklch(0.47 0.16 45);
+  --color-warning-foreground: oklch(0.98 0 0);
+  --color-destructive: oklch(0.64 0.24 25);
+  --color-destructive-foreground: oklch(0.98 0 0);
+}
+
 /* Ensure HTML element has proper dark mode setup */
 html {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Custom CSS Variables for Brand Colors */
-:root {
-  /* Light mode brand colors */
-  --brand-primary: 220 38% 15%;          /* Dark blue-gray for text */
-  --brand-primary-foreground: 0 0% 98%;   /* Light text on dark backgrounds */
-  --brand-red: 0 84% 60%;                  /* Primary red - #dc2626 equivalent */
-  --brand-red-light: 0 93% 94%;           /* Light red background - #fef2f2 equivalent */
-  --brand-red-dark: 0 63% 31%;            /* Dark red - #991b1b equivalent */
-  
-  /* Semantic colors */
-  --background: 0 0% 100%;                 /* White background */
-  --foreground: 220 38% 15%;              /* Dark text */
-  --card: 0 0% 100%;                      /* White cards */
-  --card-foreground: 220 38% 15%;        /* Dark text on cards */
-  --popover: 0 0% 100%;                   /* White popovers */
-  --popover-foreground: 220 38% 15%;     /* Dark text on popovers */
-  --muted: 220 14% 96%;                   /* Light gray muted backgrounds */
-  --muted-foreground: 220 9% 46%;        /* Medium gray text */
-  --border: 220 13% 91%;                  /* Light borders */
-  --input: 220 13% 91%;                   /* Input borders */
-  --ring: var(--brand-red);               /* Focus rings use brand red */
-  
-  /* Status colors */
-  --success: 142 76% 36%;                 /* Green */
-  --success-foreground: 0 0% 98%;        /* White text on green */
-  --warning: 45 93% 47%;                  /* Yellow/Orange */
-  --warning-foreground: 0 0% 98%;        /* White text on yellow */
-  --destructive: 0 84% 60%;               /* Red - same as brand red */
-  --destructive-foreground: 0 0% 98%;    /* White text on red */
-}
-
 /* Dark mode color overrides */
 .dark {
-  --brand-primary: 0 0% 98%;              /* Light text in dark mode */
-  --brand-primary-foreground: 220 38% 15%; /* Dark text on light backgrounds */
-  --brand-red: 0 72% 51%;                 /* Slightly muted red for dark mode */
-  --brand-red-light: 0 63% 14%;           /* Dark red background */
-  --brand-red-dark: 0 91% 71%;            /* Light red for dark mode */
+  --color-brand-primary: oklch(0.98 0 0);
+  --color-brand-red: oklch(0.51 0.20 25);
+  --color-brand-red-light: oklch(0.14 0.16 25);
+  --color-brand-red-dark: oklch(0.71 0.20 25);
   
-  --background: 220 13% 9%;               /* Very dark background - less blue */
-  --foreground: 0 0% 98%;                 /* Light text */
-  --card: 220 13% 11%;                    /* Dark card background */
-  --card-foreground: 0 0% 98%;           /* Light text on cards */
-  --popover: 220 13% 11%;                 /* Dark popover background */
-  --popover-foreground: 0 0% 98%;        /* Light text on popovers */
-  --muted: 220 13% 15%;                   /* Dark muted backgrounds */
-  --muted-foreground: 220 9% 60%;        /* Light gray text - better contrast */
-  --border: 220 13% 18%;                  /* Dark borders */
-  --input: 220 13% 18%;                   /* Dark input borders */
-  --ring: var(--brand-red);               /* Focus rings still use brand red */
+  --color-background: oklch(0.09 0.01 258);
+  --color-foreground: oklch(0.98 0 0);
+  --color-card: oklch(0.11 0.01 258);
+  --color-card-foreground: oklch(0.98 0 0);
+  --color-popover: oklch(0.11 0.01 258);
+  --color-popover-foreground: oklch(0.98 0 0);
+  --color-muted: oklch(0.15 0.01 258);
+  --color-muted-foreground: oklch(0.60 0.01 258);
+  --color-border: oklch(0.18 0.01 258);
+  --color-input: oklch(0.18 0.01 258);
+  --color-ring: oklch(0.51 0.20 25);
   
-  --success: 142 70% 45%;                 /* Slightly brighter green for dark mode */
-  --success-foreground: 0 0% 98%;        /* White text on green */
-  --warning: 45 93% 47%;                  /* Same yellow */
-  --warning-foreground: 0 0% 98%;        /* White text on yellow */
-  --destructive: 0 72% 51%;               /* Same as brand red in dark mode */
-  --destructive-foreground: 0 0% 98%;    /* White text on red */
+  --color-success: oklch(0.45 0.12 142);
+  --color-warning: oklch(0.47 0.16 45);
+  --color-destructive: oklch(0.51 0.20 25);
   
   color-scheme: dark;
 }
@@ -73,8 +71,8 @@ body {
   padding: 0;
   overflow-x: hidden;
   font-family: "Raleway", sans-serif;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }
 
 /* Font Family */
@@ -89,39 +87,22 @@ body {
 }
 
 /* Smooth transitions for theme changes */
-* {
+*,
+*::before,
+*::after {
   transition: background-color 200ms ease-in-out, 
               border-color 200ms ease-in-out, 
               color 200ms ease-in-out,
               box-shadow 200ms ease-in-out;
 }
 
-/* Custom utility classes for brand colors */
-.bg-brand-primary {
-  background-color: hsl(var(--brand-primary));
+/* Exception for elements that shouldn't transition */
+.no-transition,
+.no-transition * {
+  transition: none !important;
 }
 
-.text-brand-primary {
-  color: hsl(var(--brand-primary));
-}
-
-.bg-brand-red {
-  background-color: hsl(var(--brand-red));
-}
-
-.text-brand-red {
-  color: hsl(var(--brand-red));
-}
-
-.border-brand-red {
-  border-color: hsl(var(--brand-red));
-}
-
-.ring-brand-red {
-  --tw-ring-color: hsl(var(--brand-red));
-}
-
-/* Focus visible improvements */
-.focus-visible\:ring-brand-red:focus-visible {
-  --tw-ring-color: hsl(var(--brand-red));
+/* Additional font families for Tailwind v4 */
+@theme {
+  --font-sans: Raleway, ui-sans-serif, system-ui, sans-serif;
 }

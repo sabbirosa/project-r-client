@@ -30,6 +30,8 @@ function systemPrefersDark() {
 
 // Helper: apply class on <html> and persist when not "system"
 function applyThemeToDOM(theme) {
+  if (typeof window === "undefined" || !document) return;
+  
   const isDark = theme === "dark" || (theme === "system" && systemPrefersDark());
   const root = document.documentElement;
   
@@ -51,7 +53,14 @@ function applyThemeToDOM(theme) {
 
 export function ThemeProvider({ children }) {
   // Persisted choice: "light" | "dark" | "system"
-  const [theme, setTheme] = useState(() => getStoredTheme());
+  const [theme, setTheme] = useState(() => {
+    const stored = getStoredTheme();
+    // Apply theme immediately on mount to prevent flash
+    if (typeof window !== "undefined") {
+      applyThemeToDOM(stored);
+    }
+    return stored;
+  });
 
   // Derived boolean that your UI can use directly
   const darkMode = theme === "dark" || (theme === "system" && systemPrefersDark());
