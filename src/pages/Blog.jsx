@@ -39,7 +39,7 @@ function Blog() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -52,7 +52,7 @@ function Blog() {
         </div>
 
         {/* Search Section */}
-        <Card className="mb-8">
+        <Card className="mb-8 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
           <CardContent className="pt-6">
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
               <div className="flex gap-4">
@@ -66,7 +66,7 @@ function Blog() {
                     className="pl-10"
                   />
                 </div>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="bg-red-600 hover:bg-red-700 text-white">
                   {isLoading ? <LoadingSpinner size="sm" /> : "Search"}
                 </Button>
               </div>
@@ -83,9 +83,9 @@ function Blog() {
 
         {/* Error State */}
         {isError && (
-          <Card className="max-w-md mx-auto">
+          <Card className="max-w-md mx-auto border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
             <CardContent className="pt-6 text-center">
-              <div className="text-red-500 mb-4">
+              <div className="text-red-500 dark:text-red-400 mb-4">
                 <FaSearch className="h-12 w-12 mx-auto" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -94,7 +94,7 @@ function Blog() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 {error?.message || "Unable to fetch blogs. Please try again."}
               </p>
-              <Button onClick={() => window.location.reload()}>
+              <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700 text-white">
                 Try Again
               </Button>
             </CardContent>
@@ -103,7 +103,7 @@ function Blog() {
 
         {/* No Results */}
         {!isLoading && !isError && data?.blogs?.length === 0 && (
-          <Card className="max-w-md mx-auto">
+          <Card className="max-w-md mx-auto border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
             <CardContent className="pt-6 text-center">
               <div className="text-gray-400 dark:text-gray-600 mb-4">
                 <FaSearch className="h-12 w-12 mx-auto" />
@@ -137,7 +137,7 @@ function Blog() {
         {!isLoading && !isError && data?.blogs?.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {data.blogs.map((blog) => (
-              <Card key={blog._id} className="group hover:shadow-lg transition-shadow duration-300">
+              <Card key={blog._id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-red-50 dark:border-red-900/20 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                 <div className="relative overflow-hidden">
                   {blog.thumbnail && (
                     <img
@@ -147,8 +147,8 @@ function Blog() {
                     />
                   )}
                   {!blog.thumbnail && (
-                    <div className="w-full h-48 bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center">
-                      <FaUser className="h-16 w-16 text-red-300" />
+                    <div className="w-full h-48 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-950/30 dark:to-red-900/20 flex items-center justify-center">
+                      <FaUser className="h-16 w-16 text-red-300 dark:text-red-400" />
                     </div>
                   )}
                 </div>
@@ -174,14 +174,14 @@ function Blog() {
                   </p>
                   
                   <div className="flex items-center justify-between">
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild className="bg-red-600 hover:bg-red-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200" size="sm">
                       <Link to={`/blog/${blog._id}`}>
                         <FaEye className="h-3 w-3 mr-2" />
                         Read More
                       </Link>
                     </Button>
                     
-                    <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
                       {blog.status}
                     </span>
                   </div>

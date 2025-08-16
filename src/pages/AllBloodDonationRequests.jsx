@@ -109,66 +109,67 @@ function AllBloodDonationRequests() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-            <FaTint className="text-red-600" />
-            <span>All Blood Donation Requests</span>
-          </CardTitle>
-          <p className="text-gray-600">
-            {user.role === 'volunteer' 
-              ? 'View and manage donation request statuses' 
-              : 'Manage all blood donation requests in the system'}
-          </p>
-        </CardHeader>
-      </Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center space-x-2">
+              <FaTint className="text-red-600 dark:text-red-400" />
+              <span>All Blood Donation Requests</span>
+            </CardTitle>
+            <p className="text-gray-600 dark:text-gray-400">
+              {user.role === 'volunteer' 
+                ? 'View and manage donation request statuses' 
+                : 'Manage all blood donation requests in the system'}
+            </p>
+          </CardHeader>
+        </Card>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <div className="flex items-center space-x-2">
-              <FaFilter className="text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filter by status:</span>
+        {/* Filters */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex items-center space-x-2">
+                <FaFilter className="text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by status:</span>
+              </div>
+              <Select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="inprogress">In Progress</option>
+                <option value="done">Done</option>
+                <option value="canceled">Canceled</option>
+              </Select>
             </div>
-            <Select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="inprogress">In Progress</option>
-              <option value="done">Done</option>
-              <option value="canceled">Canceled</option>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Requests Table */}
-      <Card>
+        {/* Requests Table */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
         <CardContent className="pt-6">
           {isLoading ? (
             <div className="flex justify-center items-center h-32">
               <LoadingSpinner size="lg" text="Loading donation requests..." />
             </div>
           ) : error ? (
-            <div className="text-center text-red-600 py-8">
+            <div className="text-center text-red-600 dark:text-red-400 py-8">
               <p>Error loading donation requests: {error.message}</p>
-              <Button onClick={() => refetch()} className="mt-4">
+              <Button onClick={() => refetch()} className="mt-4 bg-red-600 hover:bg-red-700 text-white">
                 Try Again
               </Button>
             </div>
           ) : requestsData?.requests?.length === 0 ? (
             <div className="text-center py-12">
-              <FaTint className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">No donation requests found.</p>
-              <p className="text-gray-400">
+              <FaTint className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg">No donation requests found.</p>
+              <p className="text-gray-400 dark:text-gray-500">
                 {statusFilter ? `No requests with status "${statusFilter}"` : 'No requests have been created yet.'}
               </p>
             </div>
@@ -227,7 +228,7 @@ function AllBloodDonationRequests() {
                             {/* View Button */}
                             <Button
                               size="sm"
-                              variant="outline"
+                              className="bg-red-600 hover:bg-red-700 text-white border-0 shadow-sm hover:shadow-md transition-all duration-200"
                               asChild
                             >
                               <Link to={`/donation-requests/${request._id}`}>
@@ -304,60 +305,61 @@ function AllBloodDonationRequests() {
         </CardContent>
       </Card>
 
-      {/* Information Card */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-start space-x-3">
-            <FaTint className="h-5 w-5 text-red-500 mt-1" />
-            <div className="text-sm text-gray-600 space-y-2">
-              <h4 className="font-medium text-gray-900">
-                {user.role === 'volunteer' ? 'Volunteer Permissions:' : 'Admin Permissions:'}
-              </h4>
-              <ul className="list-disc list-inside space-y-1">
-                <li>View all blood donation requests with pagination and filtering</li>
-                <li>Update donation status (mark as done/canceled when in progress)</li>
-                {user.role === 'admin' && (
-                  <>
-                    <li>Edit and delete any donation request</li>
-                    <li>Full administrative control over all requests</li>
-                  </>
-                )}
-                {user.role === 'volunteer' && (
-                  <li><strong>Restricted:</strong> Cannot edit or delete requests (view and status update only)</li>
-                )}
-              </ul>
+        {/* Information Card */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardContent className="pt-6">
+            <div className="flex items-start space-x-3">
+              <FaTint className="h-5 w-5 text-red-500 dark:text-red-400 mt-1" />
+              <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                  {user.role === 'volunteer' ? 'Volunteer Permissions:' : 'Admin Permissions:'}
+                </h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>View all blood donation requests with pagination and filtering</li>
+                  <li>Update donation status (mark as done/canceled when in progress)</li>
+                  {user.role === 'admin' && (
+                    <>
+                      <li>Edit and delete any donation request</li>
+                      <li>Full administrative control over all requests</li>
+                    </>
+                  )}
+                  {user.role === 'volunteer' && (
+                    <li><strong>Restricted:</strong> Cannot edit or delete requests (view and status update only)</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Delete Confirmation Modal */}
+        <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Confirm Delete
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to delete this donation request? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleDeleteRequest}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Request'}
+              </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Delete Confirmation Modal */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Confirm Delete
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Are you sure you want to delete this donation request? This action cannot be undone.
-          </p>
-          <div className="flex justify-end space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteModal(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteRequest}
-              disabled={isDeleting}
-            >
-              {isDeleting ? 'Deleting...' : 'Delete Request'}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        </Modal>
+      </div>
     </div>
   );
 }

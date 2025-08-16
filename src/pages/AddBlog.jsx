@@ -128,31 +128,32 @@ function AddBlog() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" asChild>
-              <Link to="/dashboard/content-management">
-                <FaArrowLeft className="h-4 w-4 mr-2" />
-                Back to Content Management
-              </Link>
-            </Button>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Add New Blog
-            </CardTitle>
-          </div>
-        </CardHeader>
-      </Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" asChild>
+                <Link to="/dashboard/content-management">
+                  <FaArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Content Management
+                </Link>
+              </Button>
+              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                Add New Blog
+              </CardTitle>
+            </div>
+          </CardHeader>
+        </Card>
 
-      {/* Blog Form */}
-      <Card>
+        {/* Blog Form */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Blog Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Blog Title *
               </label>
               <Input
@@ -166,16 +167,16 @@ function AddBlog() {
                     message: "Title must be at least 5 characters long"
                   }
                 })}
-                className={errors.title ? "border-red-500" : ""}
+                className={errors.title ? "border-red-500 dark:border-red-400" : ""}
               />
               {errors.title && (
-                <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+                <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.title.message}</p>
               )}
             </div>
 
             {/* Thumbnail Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Thumbnail Image
               </label>
               
@@ -190,7 +191,7 @@ function AddBlog() {
                       className="hidden"
                       disabled={isUploadingImage}
                     />
-                    <div className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                       {isUploadingImage ? (
                         <LoadingSpinner size="sm" />
                       ) : (
@@ -202,7 +203,7 @@ function AddBlog() {
                     </div>
                   </label>
                   
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     or enter URL manually
                   </span>
                 </div>
@@ -252,10 +253,10 @@ function AddBlog() {
 
             {/* Blog Content - Rich Text Editor */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Blog Content *
               </label>
-              <div className="border border-gray-300 rounded-md overflow-hidden">
+              <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
                 <JoditEditor
                   value={content}
                   config={editorConfig}
@@ -265,17 +266,17 @@ function AddBlog() {
                 />
               </div>
               {content.length > 0 && content.length < 50 && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                   Content must be at least 50 characters long ({content.length}/50)
                 </p>
               )}
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 Use the rich text editor to format your content with headings, lists, links, images, and more.
               </p>
             </div>
 
             {/* Form Actions */}
-            <div className="flex justify-end space-x-4 pt-6 border-t">
+            <div className="flex justify-end space-x-4 pt-6 border-t dark:border-gray-700">
               <Button
                 type="button"
                 variant="outline"
@@ -287,7 +288,7 @@ function AddBlog() {
               <Button
                 type="submit"
                 disabled={isSubmitting || !content || content.trim().length < 50}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white"
               >
                 {isSubmitting ? (
                   <>
@@ -306,21 +307,22 @@ function AddBlog() {
         </CardContent>
       </Card>
 
-      {/* Helper Information */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-sm text-gray-600 space-y-2">
-            <h4 className="font-medium text-gray-900">Tips for creating a great blog:</h4>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Use a clear and compelling title that describes your content</li>
-              <li>Add a thumbnail image to make your blog more engaging</li>
-              <li>Use the rich text editor to format your content professionally</li>
-              <li>Include headings, paragraphs, lists, and images for better readability</li>
-              <li>Your blog will be saved as a draft and can be published later by an admin</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Helper Information */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardContent className="pt-6">
+            <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <h4 className="font-medium text-gray-900 dark:text-gray-100">Tips for creating a great blog:</h4>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Use a clear and compelling title that describes your content</li>
+                <li>Add a thumbnail image to make your blog more engaging</li>
+                <li>Use the rich text editor to format your content professionally</li>
+                <li>Include headings, paragraphs, lists, and images for better readability</li>
+                <li>Your blog will be saved as a draft and can be published later by an admin</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

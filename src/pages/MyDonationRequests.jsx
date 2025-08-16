@@ -112,57 +112,58 @@ function MyDonationRequests() {
   const totalRequests = requestsData?.total || 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-              <FaTint className="text-red-600" />
-              <span>My Donation Requests</span>
-            </CardTitle>
-            <Button asChild>
-              <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
-                <FaPlus className="h-4 w-4" />
-                <span>Create New Request</span>
-              </Link>
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Filters and Stats */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <FaFilter className="text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filter by status:</span>
-              </div>
-              <Select
-                value={statusFilter}
-                onChange={handleFilterChange}
-                className="min-w-48"
-              >
-                <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="inprogress">In Progress</option>
-                <option value="done">Completed</option>
-                <option value="canceled">Cancelled</option>
-              </Select>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center space-x-2">
+                <FaTint className="text-red-600 dark:text-red-400" />
+                <span>My Donation Requests</span>
+              </CardTitle>
+              <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
+                <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
+                  <FaPlus className="h-4 w-4" />
+                  <span>Create New Request</span>
+                </Link>
+              </Button>
             </div>
-            <div className="text-sm text-gray-600">
-              Total: {totalRequests} request{totalRequests !== 1 ? 's' : ''}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+        </Card>
 
-      {/* Requests Table */}
-      {requests.length > 0 ? (
-        <Card>
+        {/* Filters and Stats */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
           <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <FaFilter className="text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by status:</span>
+                </div>
+                <Select
+                  value={statusFilter}
+                  onChange={handleFilterChange}
+                  className="min-w-48"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="inprogress">In Progress</option>
+                  <option value="done">Completed</option>
+                  <option value="canceled">Cancelled</option>
+                </Select>
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Total: {totalRequests} request{totalRequests !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Requests Table */}
+        {requests.length > 0 ? (
+          <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="pt-6">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -189,7 +190,7 @@ function MyDonationRequests() {
                         {formatDateTime(request.donationDate, request.donationTime)}
                       </TableCell>
                       <TableCell>
-                        <Badge className="bg-red-100 text-red-800">
+                        <Badge className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-200">
                           {request.bloodGroup}
                         </Badge>
                       </TableCell>
@@ -202,10 +203,10 @@ function MyDonationRequests() {
                         {request.donationStatus === 'inprogress' && request.donorInfo ? (
                           <div className="text-sm">
                             <div className="font-medium">{request.donorInfo.name}</div>
-                            <div className="text-gray-500">{request.donorInfo.email}</div>
+                            <div className="text-gray-500 dark:text-gray-400">{request.donorInfo.email}</div>
                           </div>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="text-gray-400 dark:text-gray-500">-</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -228,7 +229,7 @@ function MyDonationRequests() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                             onClick={() => {
                               setSelectedRequestId(request._id);
                               setShowDeleteModal(true);
@@ -242,7 +243,7 @@ function MyDonationRequests() {
                             <>
                               <Button
                                 size="sm"
-                                className="bg-green-600 hover:bg-green-700"
+                                className="bg-green-600 hover:bg-green-700 text-white"
                                 onClick={() => handleStatusUpdate(request._id, 'done')}
                               >
                                 Done
@@ -250,7 +251,7 @@ function MyDonationRequests() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-red-600 hover:text-red-700"
+                                className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                                 onClick={() => handleStatusUpdate(request._id, 'canceled')}
                               >
                                 Cancel
@@ -279,20 +280,20 @@ function MyDonationRequests() {
         </Card>
       ) : (
         /* No Requests State */
-        <Card>
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
           <CardContent className="text-center py-12">
-            <FaTint className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <FaTint className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
               {statusFilter ? `No ${statusFilter} requests found` : 'No Donation Requests Yet'}
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
               {statusFilter 
                 ? `You don't have any ${statusFilter} donation requests.` 
                 : "You haven't created any donation requests yet. Create your first request to help someone in need."
               }
             </p>
             {!statusFilter && (
-              <Button asChild>
+              <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
                 <Link to="/dashboard/create-donation-request" className="flex items-center space-x-2">
                   <FaPlus className="h-4 w-4" />
                   <span>Create Donation Request</span>
@@ -311,54 +312,55 @@ function MyDonationRequests() {
         </Card>
       )}
 
-      {/* Error State */}
-      {error && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <div className="text-red-600 mb-4">
-              <FaTint className="mx-auto h-12 w-12" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Failed to Load Requests
-            </h3>
-            <p className="text-gray-500 mb-6">
-              There was an error loading your donation requests. Please try again.
-            </p>
-            <Button onClick={() => refetch()}>
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+        {/* Error State */}
+        {error && (
+          <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="text-center py-12">
+              <div className="text-red-600 dark:text-red-400 mb-4">
+                <FaTint className="mx-auto h-12 w-12" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Failed to Load Requests
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                There was an error loading your donation requests. Please try again.
+              </p>
+              <Button onClick={() => refetch()} className="bg-red-600 hover:bg-red-700 text-white">
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        title="Delete Donation Request"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-600">
-            Are you sure you want to delete this donation request? This action cannot be undone.
-          </p>
-          <div className="flex space-x-4 justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteModal(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-red-600 hover:bg-red-700"
-              onClick={handleDeleteRequest}
-              disabled={isDeleting}
-            >
-              {isDeleting ? <LoadingSpinner size="sm" /> : 'Delete'}
-            </Button>
+        {/* Delete Confirmation Modal */}
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title="Delete Donation Request"
+        >
+          <div className="space-y-4">
+            <p className="text-gray-600 dark:text-gray-400">
+              Are you sure you want to delete this donation request? This action cannot be undone.
+            </p>
+            <div className="flex space-x-4 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleDeleteRequest}
+                disabled={isDeleting}
+              >
+                {isDeleting ? <LoadingSpinner size="sm" /> : 'Delete'}
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      </div>
     </div>
   );
 }

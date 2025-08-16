@@ -95,7 +95,7 @@ function BloodDonationRequests() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div 
@@ -119,7 +119,7 @@ function BloodDonationRequests() {
 
         {/* Filters and Sorting */}
         <motion.div initial="initial" animate="animate" variants={fadeInUp}>
-          <Card className="mb-8 hover:shadow-lg transition-shadow duration-300">
+          <Card className="mb-8 hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
@@ -223,23 +223,23 @@ function BloodDonationRequests() {
                   whileHover={{ y: -5, shadow: "0 10px 25px rgba(0,0,0,0.1)" }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="h-full hover:shadow-lg transition-all duration-300">
+                  <Card className="h-full hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-red-50 dark:border-red-900/20 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                     <CardContent className="p-6">
                       {/* Header with Blood Group */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
                           <motion.div 
-                            className="bg-red-100 p-2 rounded-full"
+                            className="bg-red-100 dark:bg-red-950/30 p-2 rounded-full"
                             whileHover={{ scale: 1.1, rotate: 360 }}
                             transition={{ duration: 0.3 }}
                           >
-                            <FaTint className="w-4 h-4 text-red-600" />
+                            <FaTint className="w-4 h-4 text-red-600 dark:text-red-400" />
                           </motion.div>
-                          <span className="font-bold text-red-600 text-lg">
+                          <span className="font-bold text-red-600 dark:text-red-400 text-lg">
                             {request.bloodGroup}
                           </span>
                         </div>
-                        <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        <span className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
                           Urgent
                         </span>
                       </div>
@@ -251,7 +251,7 @@ function BloodDonationRequests() {
 
                       {/* Location */}
                       <div className="flex items-center text-gray-600 dark:text-gray-400 mb-2">
-                        <FaMapMarkerAlt className="w-4 h-4 mr-2" />
+                        <FaMapMarkerAlt className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400" />
                         <span className="text-sm">
                           {request.hospitalName}, {request.recipientUpazila}, {request.recipientDistrict}
                         </span>
@@ -260,13 +260,13 @@ function BloodDonationRequests() {
                       {/* Date and Time */}
                       <div className="flex items-center space-x-4 text-gray-600 dark:text-gray-400 mb-4">
                         <div className="flex items-center">
-                          <FaCalendarAlt className="w-3 h-3 mr-1" />
+                          <FaCalendarAlt className="w-3 h-3 mr-1 text-gray-500 dark:text-gray-400" />
                           <span className="text-sm">
                             {formatDate(request.donationDate)}
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <FaClock className="w-3 h-3 mr-1" />
+                          <FaClock className="w-3 h-3 mr-1 text-gray-500 dark:text-gray-400" />
                           <span className="text-sm">
                             {request.donationTime}
                           </span>
@@ -275,8 +275,10 @@ function BloodDonationRequests() {
 
                       {/* View Details Button */}
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button asChild className="w-full" variant="outline">
-                          <Link to={`/donation-requests/${request._id}`} className="flex items-center justify-center space-x-2">
+                        <Button asChild 
+
+                        className="">
+                          <Link to={`/donation-requests/${request._id}`} className="flex items-center justify-center space-x-2 w-full bg-red-600 hover:bg-red-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 rounded-md px-4 py-2 text-sm">
                             <FaEye className="w-4 h-4" />
                             <span>View Details</span>
                           </Link>
@@ -301,7 +303,7 @@ function BloodDonationRequests() {
           </>
         ) : (
           <motion.div initial="initial" animate="animate" variants={fadeInUp}>
-            <Card className="hover:shadow-lg transition-shadow duration-300">
+            <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
                   <FaTint className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
@@ -340,7 +342,7 @@ function BloodDonationRequests() {
             Every donation can save up to three lives. Join our community of heroes and make a difference today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="bg-red-600 hover:bg-red-700 text-white">
               <Link to="/register">Become a Donor</Link>
             </Button>
             <Button asChild variant="outline" size="lg">

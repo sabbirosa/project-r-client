@@ -153,59 +153,65 @@ function EditBlog() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner size="lg" text="Loading blog..." />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <LoadingSpinner size="lg" text="Loading blog..." />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="text-center text-red-600 py-8">
-        <p>Error loading blog: {error?.message || 'Blog not found'}</p>
-        <Button asChild className="mt-4">
-          <Link to="/dashboard/content-management">
-            Back to Content Management
-          </Link>
-        </Button>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-red-600 dark:text-red-400 py-8">
+            <p>Error loading blog: {error?.message || 'Blog not found'}</p>
+            <Button asChild className="mt-4 bg-red-600 hover:bg-red-700 text-white">
+              <Link to="/dashboard/content-management">
+                Back to Content Management
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Session Debugger - Remove after fixing the issue */}
-      <SessionDebugger label="EditBlog Session Monitor" />
-      
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/dashboard/content-management">
-                  <FaArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Link>
-              </Button>
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                Edit Blog
-              </CardTitle>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader>
-            <CardTitle>Blog Information</CardTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/dashboard/content-management">
+                    <FaArrowLeft className="h-4 w-4 mr-2" />
+                    Back
+                  </Link>
+                </Button>
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  Edit Blog
+                </CardTitle>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Blog Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Blog Title *
               </label>
               <Input
@@ -223,16 +229,16 @@ function EditBlog() {
                     message: "Title must not exceed 100 characters"
                   }
                 })}
-                className={errors.title ? "border-red-500" : ""}
+                className={errors.title ? "border-red-500 dark:border-red-400" : ""}
               />
               {errors.title && (
-                <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+                <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.title.message}</p>
               )}
             </div>
 
             {/* Thumbnail */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Thumbnail Image
               </label>
               
@@ -248,10 +254,10 @@ function EditBlog() {
                         message: "Please enter a valid URL"
                       }
                     })}
-                    className={errors.thumbnail ? "border-red-500" : ""}
+                    className={errors.thumbnail ? "border-red-500 dark:border-red-400" : ""}
                   />
                   {errors.thumbnail && (
-                    <p className="text-red-500 text-sm mt-1">{errors.thumbnail.message}</p>
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.thumbnail.message}</p>
                   )}
                 </div>
 
@@ -260,17 +266,17 @@ function EditBlog() {
                   <div className="flex-1">
                     <label
                       htmlFor="imageUpload"
-                      className="flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-red-400 hover:bg-red-50 transition-colors"
+                      className="flex items-center justify-center px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
                     >
                       {isUploadingImage ? (
                         <>
                           <LoadingSpinner size="sm" />
-                          <span className="ml-2 text-sm text-gray-600">Uploading...</span>
+                          <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Uploading...</span>
                         </>
                       ) : (
                         <>
                           <FaUpload className="h-5 w-5 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-600">Upload Image</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Upload Image</span>
                         </>
                       )}
                     </label>
@@ -308,10 +314,10 @@ function EditBlog() {
 
             {/* Content */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Blog Content *
               </label>
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border dark:border-gray-600 rounded-lg overflow-hidden">
                 <JoditEditor
                   value={content}
                   config={editorConfig}
@@ -319,45 +325,46 @@ function EditBlog() {
                   onBlur={() => {}} // Do nothing on blur
                 />
               </div>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 Minimum 50 characters required. Current: {content.replace(/<[^>]*>/g, '').length}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Submit Button */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                asChild
-                disabled={isSubmitting}
-              >
-                <Link to="/dashboard/content-management">
-                  Cancel
-                </Link>
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="min-w-[120px]"
-              >
-                {isSubmitting ? (
-                  <>
-                    <LoadingSpinner size="sm" />
-                    <span className="ml-2">Updating...</span>
-                  </>
-                ) : (
-                  "Update Blog"
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
+          {/* Submit Button */}
+          <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="pt-6">
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  asChild
+                  disabled={isSubmitting}
+                >
+                  <Link to="/dashboard/content-management">
+                    Cancel
+                  </Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="min-w-[120px] bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      <span className="ml-2">Updating...</span>
+                    </>
+                  ) : (
+                    "Update Blog"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </form>
+      </div>
     </div>
   );
 }

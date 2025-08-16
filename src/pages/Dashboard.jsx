@@ -145,15 +145,15 @@ function Dashboard() {
     >
       {/* Welcome Section */}
       <motion.div variants={fadeInUp}>
-        <Card className="hover:shadow-lg transition-shadow duration-300">
+        <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center space-x-2">
               <FaTint className="text-red-600" />
               <span>Welcome back, {user?.name}!</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {isDonor 
                 ? "Thank you for being part of our blood donation community. Every donation counts and helps save lives."
                 : `Welcome to your ${user?.role} dashboard. Here you can see important statistics and manage the platform.`

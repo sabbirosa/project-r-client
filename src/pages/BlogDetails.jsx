@@ -4,14 +4,14 @@ import { useState } from "react";
 import { FaArrowLeft, FaCalendar, FaCopy, FaShare, FaUser } from "react-icons/fa";
 import { Link, useParams } from "react-router";
 import {
-    FacebookIcon,
-    FacebookShareButton,
-    LinkedinIcon,
-    LinkedinShareButton,
-    TwitterIcon,
-    TwitterShareButton,
-    WhatsappIcon,
-    WhatsappShareButton
+  FacebookIcon,
+  FacebookShareButton,
+  LinkedinIcon,
+  LinkedinShareButton,
+  TwitterIcon,
+  TwitterShareButton,
+  WhatsappIcon,
+  WhatsappShareButton
 } from "react-share";
 import { toast } from "react-toastify";
 import usePublicAPI from "../api/usePublicAPI";
@@ -88,7 +88,7 @@ function BlogDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Loading State */}
         {isLoading && (
@@ -108,7 +108,7 @@ function BlogDetails() {
             animate="animate"
             variants={fadeInUp}
           >
-            <Card className="max-w-md mx-auto hover:shadow-lg transition-shadow duration-300">
+            <Card className="max-w-md mx-auto hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
               <CardContent className="pt-6 text-center">
                 <motion.div 
                   className="text-red-500 mb-4"
@@ -118,10 +118,10 @@ function BlogDetails() {
                 >
                   <FaUser className="h-12 w-12 mx-auto" />
                 </motion.div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Blog Not Found
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   {error?.response?.status === 404 
                     ? "The blog post you're looking for doesn't exist or has been removed."
                     : error?.message || "Unable to load the blog post. Please try again."
@@ -137,7 +137,7 @@ function BlogDetails() {
                     </Button>
                   </motion.div>
                   <motion.div className="inline-block" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button onClick={() => window.location.reload()}>
+                    <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700 text-white">
                       Try Again
                     </Button>
                   </motion.div>
@@ -179,11 +179,11 @@ function BlogDetails() {
 
             {/* Blog Header */}
             <motion.div variants={fadeInUp}>
-              <Card className="hover:shadow-lg transition-shadow duration-300">
+              <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                 <CardContent className="pt-6">
                   {/* Blog Meta */}
                   <motion.div 
-                    className="flex items-center space-x-6 text-sm text-gray-500 mb-6"
+                    className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400 mb-6"
                     variants={fadeInLeft}
                   >
                     <div className="flex items-center space-x-2">
@@ -195,7 +195,7 @@ function BlogDetails() {
                       <span>{format(new Date(blog.createdAt), "MMMM dd, yyyy 'at' h:mm a")}</span>
                     </div>
                     <motion.span 
-                      className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
+                      className="px-3 py-1 bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full"
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
@@ -205,7 +205,7 @@ function BlogDetails() {
 
                   {/* Blog Title */}
                   <motion.h1 
-                    className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight"
+                    className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 leading-tight"
                     variants={fadeInUp}
                   >
                     {blog.title}
@@ -232,10 +232,10 @@ function BlogDetails() {
 
             {/* Blog Content */}
             <motion.div variants={fadeInUp}>
-              <Card className="hover:shadow-lg transition-shadow duration-300">
+              <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                 <CardContent className="pt-6">
                   <div 
-                    className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-red-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-blockquote:text-gray-700 prose-blockquote:border-red-200"
+                    className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-red-600 dark:prose-a:text-red-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-ul:text-gray-700 dark:prose-ul:text-gray-300 prose-ol:text-gray-700 dark:prose-ol:text-gray-300 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-blockquote:border-red-200 dark:prose-blockquote:border-red-800 prose-pre:bg-gray-800 dark:prose-pre:bg-gray-900 prose-code:text-gray-800 dark:prose-code:text-gray-200"
                     dangerouslySetInnerHTML={{ __html: blog.content }}
                   />
                 </CardContent>
@@ -244,11 +244,11 @@ function BlogDetails() {
 
             {/* Social Sharing Section */}
             <motion.div variants={fadeInUp}>
-              <Card className="hover:shadow-lg transition-shadow duration-300">
+              <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <motion.h3 
-                      className="text-lg font-semibold text-gray-900 mb-4"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
@@ -324,14 +324,14 @@ function BlogDetails() {
 
             {/* Related Actions */}
             <motion.div variants={fadeInUp}>
-              <Card className="hover:shadow-lg transition-shadow duration-300">
+              <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                 <CardContent className="pt-6">
                   <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                     <div className="text-center sm:text-left">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
                         Found this helpful?
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-gray-600 dark:text-gray-400">
                         Share it with others or explore more blog posts.
                       </p>
                     </div>
@@ -344,7 +344,7 @@ function BlogDetails() {
                         </Button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button asChild>
+                        <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
                           <Link to="/blog">
                             More Blogs
                           </Link>
@@ -358,10 +358,10 @@ function BlogDetails() {
 
             {/* Call to Action */}
             <motion.div variants={fadeInUp}>
-              <Card className="bg-gradient-to-r from-red-50 to-red-100 border-red-200 hover:shadow-lg transition-shadow duration-300">
+              <Card className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/20 border-red-200 dark:border-red-800 hover:shadow-xl transition-all duration-300">
                 <CardContent className="pt-6 text-center">
                   <motion.h3 
-                    className="text-xl font-bold text-gray-900 mb-2"
+                    className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
@@ -369,7 +369,7 @@ function BlogDetails() {
                     Ready to Make a Difference?
                   </motion.h3>
                   <motion.p 
-                    className="text-gray-700 mb-6 max-w-2xl mx-auto"
+                    className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
@@ -383,7 +383,7 @@ function BlogDetails() {
                     transition={{ delay: 0.5 }}
                   >
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button asChild size="lg">
+                      <Button asChild size="lg" className="bg-red-600 hover:bg-red-700 text-white">
                         <Link to="/register">
                           Become a Donor
                         </Link>
@@ -415,7 +415,7 @@ function BlogDetails() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="text-gray-600">Choose how you'd like to share this blog post:</p>
+            <p className="text-gray-600 dark:text-gray-400">Choose how you'd like to share this blog post:</p>
             
             <motion.div 
               className="grid grid-cols-2 gap-4"

@@ -7,8 +7,9 @@ const Card = forwardRef(({ className, children, ...props }, ref) => (
     className={cn(
       "rounded-xl border border-gray-200 dark:border-gray-700",
       "bg-white dark:bg-gray-900",
-      "shadow-sm hover:shadow-md transition-all duration-200",
+      "shadow-lg hover:shadow-xl transition-all duration-300",
       "overflow-hidden",
+      "backdrop-blur-sm",
       className
     )}
     {...props}

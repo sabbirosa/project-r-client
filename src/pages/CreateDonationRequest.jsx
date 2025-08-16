@@ -83,9 +83,9 @@ function CreateDonationRequest() {
   if (user?.status === "blocked") {
     return (
       <div className="space-y-6">
-        <Card>
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center space-x-2">
               <FaTint className="text-red-600" />
               <span>Create Donation Request</span>
             </CardTitle>
@@ -104,55 +104,56 @@ function CreateDonationRequest() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-            <FaTint className="text-red-600" />
-            <span>Create Donation Request</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            Fill out the form below to create a blood donation request. All fields are required unless otherwise specified.
-          </p>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center space-x-2">
+              <FaTint className="text-red-600 dark:text-red-400" />
+              <span>Create Donation Request</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 dark:text-gray-400">
+              Fill out the form below to create a blood donation request. All fields are required unless otherwise specified.
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Form */}
-      <Card>
+        {/* Form */}
+        <Card className="border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Requester Information (Read-only) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Requester Name
                 </label>
                 <Input
                   {...register("requesterName")}
                   readOnly
-                  className="bg-gray-50"
+                  className="bg-gray-50 dark:bg-gray-800/50"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Requester Email
                 </label>
                 <Input
                   {...register("requesterEmail")}
                   readOnly
-                  className="bg-gray-50"
+                  className="bg-gray-50 dark:bg-gray-800/50"
                 />
               </div>
             </div>
 
             {/* Recipient Information */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Recipient Name <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Recipient Name <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <Input
                 {...register("recipientName", {
@@ -161,15 +162,15 @@ function CreateDonationRequest() {
                 placeholder="Enter recipient's full name"
               />
               {errors.recipientName && (
-                <p className="mt-1 text-sm text-red-600">{errors.recipientName.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.recipientName.message}</p>
               )}
             </div>
 
             {/* Location */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Recipient District <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Recipient District <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <Select
                   {...register("recipientDistrict", {
@@ -185,13 +186,13 @@ function CreateDonationRequest() {
                   ))}
                 </Select>
                 {errors.recipientDistrict && (
-                  <p className="mt-1 text-sm text-red-600">{errors.recipientDistrict.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.recipientDistrict.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Recipient Upazila <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Recipient Upazila <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <Select
                   {...register("recipientUpazila", {
@@ -207,15 +208,15 @@ function CreateDonationRequest() {
                   ))}
                 </Select>
                 {errors.recipientUpazila && (
-                  <p className="mt-1 text-sm text-red-600">{errors.recipientUpazila.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.recipientUpazila.message}</p>
                 )}
               </div>
             </div>
 
             {/* Hospital and Address */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hospital Name <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Hospital Name <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <Input
                 {...register("hospitalName", {
@@ -224,13 +225,13 @@ function CreateDonationRequest() {
                 placeholder="e.g., Dhaka Medical College Hospital"
               />
               {errors.hospitalName && (
-                <p className="mt-1 text-sm text-red-600">{errors.hospitalName.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.hospitalName.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Address <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Full Address <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <Input
                 {...register("fullAddress", {
@@ -239,14 +240,14 @@ function CreateDonationRequest() {
                 placeholder="e.g., Zahir Raihan Rd, Dhaka"
               />
               {errors.fullAddress && (
-                <p className="mt-1 text-sm text-red-600">{errors.fullAddress.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullAddress.message}</p>
               )}
             </div>
 
             {/* Blood Group */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Blood Group <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Blood Group <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <Select
                 {...register("bloodGroup", {
@@ -261,15 +262,15 @@ function CreateDonationRequest() {
                 ))}
               </Select>
               {errors.bloodGroup && (
-                <p className="mt-1 text-sm text-red-600">{errors.bloodGroup.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.bloodGroup.message}</p>
               )}
             </div>
 
             {/* Date and Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Donation Date <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Donation Date <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <Input
                   type="date"
@@ -285,13 +286,13 @@ function CreateDonationRequest() {
                   min={new Date().toISOString().split('T')[0]}
                 />
                 {errors.donationDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.donationDate.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.donationDate.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Donation Time <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Donation Time <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <Input
                   type="time"
@@ -300,15 +301,15 @@ function CreateDonationRequest() {
                   })}
                 />
                 {errors.donationTime && (
-                  <p className="mt-1 text-sm text-red-600">{errors.donationTime.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.donationTime.message}</p>
                 )}
               </div>
             </div>
 
             {/* Request Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Request Message <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Request Message <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <Textarea
                 {...register("requestMessage", {
@@ -322,7 +323,7 @@ function CreateDonationRequest() {
                 placeholder="Please describe why you need blood donation and any additional details..."
               />
               {errors.requestMessage && (
-                <p className="mt-1 text-sm text-red-600">{errors.requestMessage.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.requestMessage.message}</p>
               )}
             </div>
 
@@ -338,7 +339,7 @@ function CreateDonationRequest() {
               </Button>
               <Button
                 type="submit"
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-red-600 hover:bg-red-700 text-white"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -351,6 +352,7 @@ function CreateDonationRequest() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

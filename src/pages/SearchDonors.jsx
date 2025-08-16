@@ -149,7 +149,7 @@ function SearchDonors() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div 
@@ -172,7 +172,7 @@ function SearchDonors() {
           animate="animate"
           variants={fadeInUp}
         >
-          <Card className="mb-8 hover:shadow-lg transition-shadow duration-300">
+          <Card className="mb-8 hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
             <CardContent className="p-6">
               <form onSubmit={handleSearch} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -332,7 +332,7 @@ function SearchDonors() {
                       whileHover={{ y: -5, shadow: "0 10px 25px rgba(0,0,0,0.1)" }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Card className="h-full hover:shadow-lg transition-all duration-300">
+                      <Card className="h-full hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-red-50 dark:border-red-900/20 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                         <CardContent className="p-6">
                           <div className="flex items-center space-x-4 mb-4">
                             {donor.avatar ? (
@@ -372,7 +372,7 @@ function SearchDonors() {
                 </motion.div>
               ) : (
                 <motion.div variants={fadeInUp}>
-                  <Card className="hover:shadow-lg transition-shadow duration-300">
+                  <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                     <CardContent className="p-8 text-center">
                       <motion.div
                         initial={{ scale: 0 }}
@@ -402,7 +402,7 @@ function SearchDonors() {
             animate="animate"
             variants={fadeInUp}
           >
-            <Card className="hover:shadow-lg transition-shadow duration-300">
+            <Card className="hover:shadow-xl transition-all duration-300 border-red-100 dark:border-red-900/30 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <motion.div
                   initial={{ scale: 0 }}
