@@ -111,12 +111,12 @@ function Dashboard() {
   // Get status badge variant
   const getStatusBadge = (status) => {
     const variants = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      inprogress: 'bg-blue-100 text-blue-800',
-      done: 'bg-green-100 text-green-800',
-      canceled: 'bg-red-100 text-red-800'
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+      inprogress: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+      done: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      canceled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
     };
-    return variants[status] || 'bg-gray-100 text-gray-800';
+    return variants[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
   // Format date and time
@@ -171,16 +171,16 @@ function Dashboard() {
         >
           {/* Total Users */}
           <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-b border-gray-200lue-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/30 border-blue-200 dark:border-blue-700 hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-600 text-sm font-medium mb-1">Total Users</p>
-                    <p className="text-3xl font-bold text-blue-900">{dashboardStats.totalUsers}</p>
-                    <p className="text-blue-700 text-sm">Active Donors</p>
+                    <p className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">Total Users</p>
+                    <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{dashboardStats.totalUsers}</p>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm">Active Donors</p>
                   </div>
                   <motion.div 
-                    className="bg-blue-500 p-3 rounded-full"
+                    className="bg-blue-500 dark:bg-blue-600 p-3 rounded-full"
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
                   >
@@ -193,16 +193,16 @@ function Dashboard() {
 
           {/* Total Blood Donation Requests */}
           <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/30 border-red-200 dark:border-red-700 hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-red-600 text-sm font-medium mb-1">Blood Requests</p>
-                    <p className="text-3xl font-bold text-red-900">{dashboardStats.totalRequests}</p>
-                    <p className="text-red-700 text-sm">All Time</p>
+                    <p className="text-red-600 dark:text-red-400 text-sm font-medium mb-1">Blood Requests</p>
+                    <p className="text-3xl font-bold text-red-900 dark:text-red-100">{dashboardStats.totalRequests}</p>
+                    <p className="text-red-700 dark:text-red-300 text-sm">All Time</p>
                   </div>
                   <motion.div 
-                    className="bg-red-500 p-3 rounded-full"
+                    className="bg-red-500 dark:bg-red-600 p-3 rounded-full"
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
                   >
@@ -215,16 +215,16 @@ function Dashboard() {
 
           {/* Total Funding */}
           <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow duration-300">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/30 border-green-200 dark:border-green-700 hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-green-600 text-sm font-medium mb-1">Total Funding</p>
-                    <p className="text-3xl font-bold text-green-900">${dashboardStats.totalFunding}</p>
-                    <p className="text-green-700 text-sm">Raised</p>
+                    <p className="text-green-600 dark:text-green-400 text-sm font-medium mb-1">Total Funding</p>
+                    <p className="text-3xl font-bold text-green-900 dark:text-green-100">${dashboardStats.totalFunding}</p>
+                    <p className="text-green-700 dark:text-green-300 text-sm">Raised</p>
                   </div>
                   <motion.div 
-                    className="bg-green-500 p-3 rounded-full"
+                    className="bg-green-500 dark:bg-green-600 p-3 rounded-full"
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
                   >
@@ -249,7 +249,7 @@ function Dashboard() {
         <motion.div variants={fadeInUp}>
           <Card className="hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900">
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                 Quick Actions
               </CardTitle>
             </CardHeader>
@@ -295,7 +295,7 @@ function Dashboard() {
           <Card className="hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-xl font-semibold text-gray-900">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   Recent Donation Requests
                 </CardTitle>
                 <Button asChild>
@@ -332,7 +332,7 @@ function Dashboard() {
                           {formatDateTime(request.donationDate, request.donationTime)}
                         </TableCell>
                         <TableCell>
-                          <Badge className="bg-red-100 text-red-800">
+                          <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
                             {request.bloodGroup}
                           </Badge>
                         </TableCell>
@@ -344,11 +344,11 @@ function Dashboard() {
                         <TableCell>
                           {request.donationStatus === 'inprogress' && request.donorInfo ? (
                             <div className="text-sm">
-                              <div className="font-medium">{request.donorInfo.name}</div>
-                              <div className="text-gray-500">{request.donorInfo.email}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{request.donorInfo.name}</div>
+                              <div className="text-gray-500 dark:text-gray-400">{request.donorInfo.email}</div>
                             </div>
                           ) : (
-                            <span className="text-gray-400">-</span>
+                            <span className="text-gray-400 dark:text-gray-500">-</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -417,11 +417,11 @@ function Dashboard() {
         <motion.div variants={fadeInUp}>
           <Card className="hover:shadow-lg transition-shadow duration-300">
             <CardContent className="text-center py-12">
-              <FaTint className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <FaTint className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 No Donation Requests Yet
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 You haven't created any donation requests yet. Create your first request to help someone in need.
               </p>
               <Button asChild>
@@ -440,13 +440,13 @@ function Dashboard() {
         <motion.div variants={fadeInUp}>
           <Card className="hover:shadow-lg transition-shadow duration-300">
             <CardContent className="text-center py-12">
-              <div className="text-red-600 mb-4">
+              <div className="text-red-600 dark:text-red-400 mb-4">
                 <FaTint className="mx-auto h-12 w-12" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Failed to Load Dashboard
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 There was an error loading your dashboard data. Please try again.
               </p>
               <Button onClick={() => isDonor ? refetchRequests() : refetchStats()}>
@@ -464,7 +464,7 @@ function Dashboard() {
         title="Delete Donation Request"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Are you sure you want to delete this donation request? This action cannot be undone.
           </p>
           <div className="flex space-x-4 justify-end">

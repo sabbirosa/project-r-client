@@ -109,11 +109,11 @@ export default function DonationAnalytics() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-12"
                 >
-                    <div className="mx-auto w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-                        <FaChartArea className="w-12 h-12 text-yellow-600" />
+                    <div className="mx-auto w-24 h-24 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mb-4">
+                        <FaChartArea className="w-12 h-12 text-yellow-600 dark:text-yellow-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Analytics Access Required</h3>
-                    <p className="text-gray-600 max-w-md mx-auto">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Analytics Access Required</h3>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
                         Analytics data is only available to administrators and volunteers. 
                         Please contact your administrator if you need access to this information.
                     </p>
@@ -131,11 +131,11 @@ export default function DonationAnalytics() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-12"
                 >
-                    <div className="mx-auto w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                        <FaChartArea className="w-12 h-12 text-red-600" />
+                    <div className="mx-auto w-24 h-24 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                        <FaChartArea className="w-12 h-12 text-red-600 dark:text-red-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h3>
-                    <p className="text-gray-600 max-w-md mx-auto">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Access Denied</h3>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
                         You don't have permission to view analytics data. Your session may have expired. 
                         Please log out and log back in.
                     </p>
@@ -153,11 +153,11 @@ export default function DonationAnalytics() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-12"
                 >
-                    <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <FaChartArea className="w-12 h-12 text-gray-600" />
+                    <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                        <FaChartArea className="w-12 h-12 text-gray-600 dark:text-gray-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Server Error</h3>
-                    <p className="text-gray-600 max-w-md mx-auto">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Server Error</h3>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
                         There was an error loading analytics data from the server. 
                         Please try again later or contact support.
                     </p>
@@ -172,7 +172,7 @@ export default function DonationAnalytics() {
             <div className="space-y-6">
                 <div className="flex items-center justify-center py-12">
                     <LoadingSpinner size="lg" />
-                    <span className="ml-3 text-lg text-gray-600">Loading analytics data...</span>
+                    <span className="ml-3 text-lg text-gray-600 dark:text-gray-400">Loading analytics data...</span>
                 </div>
             </div>
         );
@@ -221,11 +221,11 @@ export default function DonationAnalytics() {
                 className="flex justify-between items-center"
             >
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <FaChartArea className="text-red-600" />
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <FaChartArea className="text-red-600 dark:text-red-400" />
                         Donation Analytics
                     </h1>
-                    <p className="text-gray-600 mt-1">Comprehensive insights into donation patterns and statistics</p>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">Comprehensive insights into donation patterns and statistics</p>
                 </div>
                 <Select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
                     <option value="daily">Daily View</option>
@@ -245,8 +245,8 @@ export default function DonationAnalytics() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-600">Total Donations</p>
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Donations</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                     {processedData.donationStats.totalRequests || processedData.donationStats.total || 0}
                                 </p>
                             </div>
@@ -259,8 +259,8 @@ export default function DonationAnalytics() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-600">Active Donors</p>
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Donors</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                     {processedData.userStats.totalUsers || processedData.userStats.total || 0}
                                 </p>
                             </div>
@@ -273,8 +273,8 @@ export default function DonationAnalytics() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-600">Success Rate</p>
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Success Rate</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                     {(processedData.donationStats.totalRequests || processedData.donationStats.total) > 0 
                                         ? Math.round(((processedData.donationStats.completedRequests || processedData.donationStats.completed || 0) / (processedData.donationStats.totalRequests || processedData.donationStats.total)) * 100)
                                         : 0}%
@@ -289,8 +289,8 @@ export default function DonationAnalytics() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-600">Total Funding</p>
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Funding</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                     ${(processedData.fundingStats.totalAmount || 0).toLocaleString()}
                                 </p>
                             </div>
@@ -315,10 +315,10 @@ export default function DonationAnalytics() {
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={donationTrends}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                                    <XAxis dataKey="name" stroke="currentColor" opacity={0.7} />
+                                    <YAxis stroke="currentColor" opacity={0.7} />
+                                    <Tooltip contentStyle={{backgroundColor: 'var(--tooltip-bg, #ffffff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: '8px'}} />
                                     <Area 
                                         type="monotone" 
                                         dataKey="donations" 
@@ -357,7 +357,7 @@ export default function DonationAnalytics() {
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip contentStyle={{backgroundColor: 'var(--tooltip-bg, #ffffff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: '8px'}} />
                                 </PieChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -377,10 +377,10 @@ export default function DonationAnalytics() {
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={userGrowth}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                                    <XAxis dataKey="name" stroke="currentColor" opacity={0.7} />
+                                    <YAxis stroke="currentColor" opacity={0.7} />
+                                    <Tooltip contentStyle={{backgroundColor: 'var(--tooltip-bg, #ffffff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: '8px'}} />
                                     <Legend />
                                     <Line 
                                         type="monotone" 
@@ -407,10 +407,10 @@ export default function DonationAnalytics() {
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart data={processedData.bloodGroups}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                                    <XAxis dataKey="name" stroke="currentColor" opacity={0.7} />
+                                    <YAxis stroke="currentColor" opacity={0.7} />
+                                    <Tooltip contentStyle={{backgroundColor: 'var(--tooltip-bg, #ffffff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: '8px'}} />
                                     <Bar dataKey="count" fill="#ef4444" />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -432,10 +432,10 @@ export default function DonationAnalytics() {
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
                             <AreaChart data={fundingTrends}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+                                <XAxis dataKey="name" stroke="currentColor" opacity={0.7} />
+                                <YAxis stroke="currentColor" opacity={0.7} />
+                                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, 'Amount']} contentStyle={{backgroundColor: 'var(--tooltip-bg, #ffffff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: '8px'}} />
                                 <Area 
                                     type="monotone" 
                                     dataKey="amount" 

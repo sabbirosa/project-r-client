@@ -25,6 +25,10 @@
   --color-input: oklch(0.91 0.01 258);
   --color-ring: oklch(0.64 0.24 25);
   
+  /* Chart tooltip colors */
+  --tooltip-bg: oklch(1 0 0);
+  --tooltip-border: oklch(0.91 0.01 258);
+  
   /* Status colors */
   --color-success: oklch(0.36 0.12 142);
   --color-success-foreground: oklch(0.98 0 0);
@@ -61,6 +65,10 @@ html {
   --color-success: oklch(0.45 0.12 142);
   --color-warning: oklch(0.47 0.16 45);
   --color-destructive: oklch(0.51 0.20 25);
+  
+  /* Chart tooltip colors for dark mode */
+  --tooltip-bg: oklch(0.11 0.01 258);
+  --tooltip-border: oklch(0.18 0.01 258);
   
   color-scheme: dark;
 }
